@@ -645,7 +645,7 @@
 
   function loadYouTubeChannel(channel){
 
-    toggleMute();
+    //toggleMute();
     els["demo-canvas"].style.display = "none";
     els["player-layer"].style.display = "block";
     els["player-layer"].style.opacity = "1";
@@ -667,8 +667,7 @@
                 
                 //if(!state.muted) e.target.unMute();
                 //toggleMute();
-                ytPlayer.setVolume(100);
-                setTimeout(() => toggleMute(), 1000);
+                setTimeout(() => ytPlayer.unMute(), 1000);
 
                 ensurePlaying(e.target);
 
