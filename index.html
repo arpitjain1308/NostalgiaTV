@@ -644,6 +644,7 @@
   }
 
   function loadYouTubeChannel(channel){
+    toggleMute();
     els["demo-canvas"].style.display = "none";
     els["player-layer"].style.display = "block";
     els["player-layer"].style.opacity = "1";
@@ -664,7 +665,6 @@
                 e.target.unloadModule('captions');
                 
                 //if(!state.muted) e.target.unMute();
-                toggleMute();
                 toggleMute();
                 ensurePlaying(e.target);
               }catch(err){}
