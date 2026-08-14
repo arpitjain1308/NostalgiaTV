@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+<title>Nostalgia TV — Watch Cartoons Like It's 2012</title>
+<meta name="description" content="A nostalgic TV experience inspired by the cartoons and television channels of the early 2010s. Turn on the TV. Pick a channel. Go back to 2012." />
+<meta property="og:title" content="Nostalgia TV — Watch Cartoons Like It's 2012" />
+<meta property="og:description" content="Turn on the TV. Pick a channel. Go back in time." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='16' width='56' height='38' rx='7' fill='%230c0a08'/%3E%3Crect x='9' y='21' width='46' height='28' rx='4' fill='%23a5311f'/%3E%3Crect x='13' y='25' width='38' height='20' rx='2' fill='%23dba53f'/%3E%3Cpath d='M20 10 L28 16 M44 10 L36 16' stroke='%230c0a08' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='50' cy='53' r='2.4' fill='%23dba53f'/%3E%3Ccircle cx='56' cy='53' r='2.4' fill='%23dba53f'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600;1,9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+Devanagari:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bezel-0:#0c0a08; --bezel-1:#1c1512; --bezel-2:#241a15;
+    --brick:#a5311f; --brick-deep:#6f1f14; --brick-bright:#c74a2e;
+    --cream:#f4e8d4; --cream-dim:#cdbda3; --gold:#dba53f;
+    --leaf:#4c7a4f; --sky:#6f93a8; --ink:#0c0806;
+    --shadow-deep: 0 30px 70px rgba(0,0,0,.55);
+    --ease: cubic-bezier(.22,.8,.28,1);
+  }
+  *{box-sizing:border-box;}
+  html,body{ margin:0; padding:0; height:100%; overscroll-behavior:none; }
+  body{
+    background:#050403; color: var(--cream);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    height:100%; overflow:hidden; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{ font-family:'Fraunces', serif; }
+  button{ font-family:inherit; }
+  ::selection{ background: var(--brick); color:var(--cream); }
+  :focus-visible{ outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
+
+  /* ---------- INTRO: black typing screen ---------- */
+  #intro-black{
+    position:fixed; inset:0; z-index:10000; background:#000;
+    display:flex; align-items:center; justify-content:center;
+    transition: opacity .45s linear;
+  }
+  #intro-black.fade-out{ opacity:0; pointer-events:none; }
+  #intro-text{
+    color:#fff; font-family:'IBM Plex Mono', monospace;
+    font-size: clamp(16px,3.6vw,32px); letter-spacing:.02em; text-align:center; padding:0 20px;
+  }
+  .caret{ display:inline-block; width:2px; height:1em; background:#fff; margin-left:3px; vertical-align:-2px; animation: caretBlink 0.9s steps(1) infinite; }
+  @keyframes caretBlink{ 50%{ opacity:0; } }
+
+  /* ---------- SPLASH (no zoom — flash-in only) ---------- */
+  #splash{ position:fixed; inset:0; z-index:9999; background:#000; display:flex; align-items:center; justify-content:center; }
+  #splash img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; }
+  #splash.run img{ animation: splashIn 2s var(--ease) forwards; }
+  #splash::after{ content:""; position:absolute; inset:0; background: radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(0,0,0,.55) 100%); pointer-events:none; }
+  #splash .splash-mark{ position:relative; z-index:2; text-align:center; opacity:0; }
+  #splash.run .splash-mark{ animation: markIn 2s var(--ease) forwards; }
+  #splash .splash-mark .tag{ font-family:'IBM Plex Mono', monospace; letter-spacing:.35em; font-size:11px; color: var(--gold); text-transform:uppercase; margin-bottom:10px; }
+  #splash .splash-mark h1{ font-size: clamp(28px, 6vw, 58px); font-style:italic; font-weight:600; margin:0; color:#fff; text-shadow: 0 4px 30px rgba(0,0,0,.6); }
+  @keyframes splashIn{
+    0%{ opacity:0; filter: brightness(0) saturate(1.05) contrast(1.05); }
+    8%{ filter: brightness(2.2) saturate(1.05) contrast(1.05); }
+    22%{ opacity:1; filter: brightness(1) saturate(1.05) contrast(1.05); }
+    100%{ opacity:1; }
+  }
+  @keyframes markIn{ 0%,15%{opacity:0; transform:translateY(8px);} 35%{opacity:1; transform:translateY(0);} 88%{opacity:1;} 100%{opacity:0;} }
+  #splash.fade-out{ opacity:0; transition: opacity .35s linear; pointer-events:none; }
+  @media (prefers-reduced-motion: reduce){ #splash img{ animation-duration:.3s !important;} #splash .splash-mark{ animation-duration:.3s !important;} }
+
+  /* CRT power-on flash bridging splash -> TV */
+  #crt-boot{ position:fixed; inset:0; z-index:9998; background:#fff; opacity:0; pointer-events:none; }
+  #crt-boot.flash{ animation: crtFlash .55s ease-out forwards; }
+  @keyframes crtFlash{ 0%{opacity:0;} 8%{opacity:1;} 28%{opacity:.85;} 45%{opacity:0;} 100%{opacity:0;} }
+  .crt-line{ position:fixed; left:0; right:0; top:50%; height:2px; background:#fff; z-index:9998; transform: translateY(-50%) scaleY(0); opacity:0; pointer-events:none; box-shadow:0 0 40px 8px rgba(255,255,255,.9); }
+  .crt-line.boot{ animation: crtLine .6s var(--ease) forwards; }
+  @keyframes crtLine{
+    0%{ transform: translateY(-50%) scaleY(0); opacity:0; }
+    10%{ transform: translateY(-50%) scaleY(.004); opacity:1; }
+    38%{ transform: translateY(-50%) scaleY(.004); opacity:1; }
+    60%{ transform: translateY(-50%) scaleY(1.06); opacity:1; }
+    78%{ transform: translateY(-50%) scaleY(.97); opacity:1; }
+    100%{ transform: translateY(-50%) scaleY(1); opacity:0; }
+  }
+
+  /* ---------- APP SHELL (fixed viewport, no scroll, near full width) ---------- */
+  #app{ opacity:0; height:100%; max-width:1620px; margin:0 auto; padding: 8px; display:flex; flex-direction:column; min-height:0; }
+  #app.visible{ opacity:1; transition: opacity .25s linear; }
+
+  /* CRT television casing */
+  .tv-set{
+    background: linear-gradient(160deg, #2a1f19, #0c0a08 65%);
+    border-radius: 26px; padding: 12px;
+    box-shadow: var(--shadow-deep), inset 0 2px 0 rgba(255,255,255,.06), inset 0 -2px 0 rgba(0,0,0,.4);
+    border: 1px solid rgba(255,255,255,.07);
+    position:relative; flex:1; min-height:0; display:flex; flex-direction:column;
+  }
+  .tv-set::before{ content:""; position:absolute; inset:0; border-radius:26px; pointer-events:none; background: repeating-linear-gradient(115deg, rgba(255,255,255,.018) 0 2px, transparent 2px 6px); mix-blend-mode: overlay; }
+  .tv-set.boot{ animation: tvBoot .5s var(--ease) .05s both; }
+  @keyframes tvBoot{ 0%{ filter:brightness(4) contrast(1.3); } 55%{ filter:brightness(1.4); } 100%{ filter:brightness(1); } }
+
+  /* screen -- fills remaining space, recessed like a CRT tube */
+  .screen-shell{
+    position:relative; border-radius: 18px; overflow:hidden; background:#000; width:100%; flex:1; min-height:0;
+    box-shadow: inset 0 0 0 3px rgba(0,0,0,.55), inset 0 0 0 4px rgba(255,255,255,.04), inset 0 0 70px rgba(0,0,0,.7);
+  }
+  .screen-inner{ position:absolute; inset:0; }
+  .demo-canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .player-layer{ position:absolute; inset:0; width:100%; height:100%; }
+  .player-layer iframe{ width:100%; height:100%; border:0; display:block; pointer-events:none; }
+  /* permanent subtle glass reflection, independent of CRT toggle */
+  .screen-shell::after{
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:6;
+    background: radial-gradient(140% 90% at 20% -10%, rgba(255,255,255,.06), transparent 45%);
+  }
+
+  /* persistent watermark logo — bottom-left, always visible */
+  .watermark{
+    position:absolute; bottom:14px; left:16px; z-index:9; display:flex; align-items:baseline; gap:7px;
+    font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:19px;
+    color:rgba(244,232,212,.6); text-shadow:0 2px 10px rgba(0,0,0,.7); pointer-events:none;
+  }
+  .watermark b{ color: rgba(199,74,46,.82); font-style:normal; }
+
+  /* auto-hiding info layer */
+  .info-layer{ position:absolute; inset:0; z-index:8; opacity:1; transition: opacity .5s var(--ease); pointer-events:none; }
+  .info-layer.hidden{ opacity:0; }
+  .info-layer *{ pointer-events:none; }
+
+  /* channel badge — now top-left, where the logo used to be */
+  .bug-tl{ position:absolute; top:16px; left:16px; display:flex; align-items:center; gap:10px; background: rgba(10,7,5,.48); backdrop-filter: blur(3px); padding:8px 15px 8px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.1); }
+  .bug-tl .logo{ width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; flex:none; }
+  .bug-tl .txt{ line-height:1.1; }
+  .bug-tl .num{ font-family:'IBM Plex Mono',monospace; font-size:16px; color:var(--gold); font-weight:600; }
+  .bug-tl .nm{ font-size:16px; font-weight:700; }
+
+  .bug-tr{ position:absolute; top:16px; right:16px; display:flex; align-items:center; gap:10px; }
+  .bug-tr .clk{ font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--cream-dim); background: rgba(10,7,5,.45); backdrop-filter: blur(3px); padding:8px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.1); }
+  .live-pill{ display:flex; align-items:center; gap:7px; background: rgba(192,57,43,.22); border:1px solid rgba(192,57,43,.5); color:#f0897c; font-size:11.5px; font-weight:700; padding:8px 14px 8px 10px; border-radius:999px; letter-spacing:.08em; backdrop-filter: blur(3px); }
+  .live-dot{ width:7px; height:7px; border-radius:50%; background:#e0402c; box-shadow:0 0 8px #e0402c; animation:pulse 1.6s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
+
+  .bug-bottom{ position:absolute; left:0; right:0; bottom:0; padding: 30px 16px 14px; display:flex; align-items:center; justify-content:flex-end; gap:14px; background: linear-gradient(180deg, transparent, rgba(6,4,3,.8) 60%, rgba(6,4,3,.9)); flex-wrap:wrap; }
+  .now-pill{ display:flex; align-items:center; gap:11px; min-width:0; background: linear-gradient(100deg, rgba(165,49,31,.88), rgba(60,20,14,.7)); border:1px solid rgba(255,255,255,.14); border-radius: 999px; padding:7px 16px 7px 7px; box-shadow: 0 10px 26px rgba(0,0,0,.35); max-width:60%; }
+  .now-pill .thumb{ width:34px; height:34px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:15px; }
+  .now-pill .meta{ min-width:0; }
+  .now-pill .meta .t1{ font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:250px; }
+  .now-pill .meta .t2{ font-size:10.5px; color:var(--cream-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:250px; }
+  .next-tag{ font-size:12px; color: var(--cream-dim); white-space:nowrap; }
+  .next-tag b{ color:var(--cream); font-weight:600; }
+
+  /* onboarding hint — bigger, more transparent, shows briefly, includes swipe */
+  #hint-layer{ position:absolute; inset:0; z-index:30; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: opacity .5s var(--ease); }
+  #hint-layer.show{ opacity:.82; }
+  .hint-box{ display:flex; align-items:center; gap:32px; background:rgba(8,6,5,.24); backdrop-filter: blur(2px); padding:22px 36px; border-radius:20px; border:1px solid rgba(255,255,255,.1); flex-wrap:wrap; justify-content:center; }
+  .hint-item{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .hint-key{ font-family:'IBM Plex Mono',monospace; font-size:17px; font-weight:600; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); padding:9px 16px; border-radius:10px; }
+  .hint-swipe{ font-size:20px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); padding:9px 16px; border-radius:10px; }
+  .hint-label{ font-size:12px; color:var(--cream-dim); letter-spacing:.03em; text-align:center; }
+
+  /* CRT overlay (scanlines etc — toggle) */
+  .crt-layer{ position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .3s; z-index:5; }
+  .crt-on .crt-layer{ opacity:1; }
+  .crt-scanlines{ position:absolute; inset:0; background: repeating-linear-gradient(to bottom, rgba(0,0,0,.18) 0px, rgba(0,0,0,.18) 1px, transparent 2px, transparent 3px); mix-blend-mode: multiply; }
+  .crt-vignette{ position:absolute; inset:0; background: radial-gradient(120% 100% at 50% 50%, transparent 58%, rgba(0,0,0,.55) 100%); box-shadow: inset 0 0 90px 20px rgba(0,0,0,.5); }
+  .crt-rgb{ position:absolute; inset:0; mix-blend-mode:screen; opacity:.06; background: linear-gradient(90deg, #ff3b3b 0, transparent 2px, transparent 4px, #3bd6ff 4px, transparent 6px); background-size: 6px 100%; }
+  .crt-flicker{ position:absolute; inset:0; background:#fff; opacity:0; animation: flick 5.5s infinite; }
+  @keyframes flick{ 0%,96%,100%{opacity:0;} 97%{opacity:.03;} 98%{opacity:0;} 99%{opacity:.05;} }
+
+  /* channel-change static */
+  .static-layer{ position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; background:#000; opacity:0; pointer-events:none; }
+  .static-layer.active{ opacity:1; pointer-events:all; }
+  .static-canvas{ position:absolute; inset:0; width:100%; height:100%; opacity:.9; }
+  .chan-card{ position:relative; z-index:2; text-align:center; }
+  .chan-card .num{ font-family:'IBM Plex Mono',monospace; font-size: clamp(28px,7vw,50px); font-weight:600; color:#fff; letter-spacing:.02em; text-shadow: 0 0 24px rgba(0,0,0,.8);}
+  .chan-card .nm{ font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size: clamp(15px,3vw,22px); color: var(--gold); margin-top:2px; }
+
+  .state-layer{ position:absolute; inset:0; z-index:15; display:none; align-items:center; justify-content:center; flex-direction:column; gap:8px; text-align:center; padding:16px; background: linear-gradient(180deg, rgba(10,7,6,.92), rgba(10,7,6,.98)); }
+  .state-layer.show{ display:flex; }
+  .state-layer .icon{ font-size:32px; opacity:.85; }
+  .state-layer h3{ margin:2px 0 2px; font-size:16px; font-style:italic; font-weight:600; }
+  .state-layer p{ margin:0; color:var(--cream-dim); font-size:12px; max-width:300px; }
+  .state-layer .row{ display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; justify-content:center; }
+  .btn{ border:1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06); color:var(--cream); padding:8px 14px; border-radius:9px; font-size:11.5px; font-weight:600; letter-spacing:.04em; cursor:pointer; transition: all .18s; }
+  .btn:hover{ background: rgba(255,255,255,.14); }
+  .btn.primary{ background: var(--brick); border-color: var(--brick-bright); }
+  .btn.primary:hover{ background: var(--brick-bright); }
+
+  /* controls bar — CH-, [Menu, Mute, CRT, Settings], CH+ */
+  .controls-bar{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 10px 4px 2px; flex:none; flex-wrap:wrap; }
+  .ch-btn{ display:flex; align-items:center; gap:7px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); color:var(--cream); padding:12px 20px; border-radius:12px; font-weight:700; font-size:13px; letter-spacing:.05em; cursor:pointer; transition: all .15s; }
+  .ch-btn:hover{ background: rgba(255,255,255,.12); transform: translateY(-1px); }
+  .mid-controls{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .icon-btn{ background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color: var(--cream-dim); width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; transition: all .15s; flex:none; }
+  .icon-btn:hover{ color:var(--cream); background: rgba(255,255,255,.12); }
+  .icon-btn.on{ color: var(--gold); border-color: rgba(219,165,63,.5); background: rgba(219,165,63,.1); }
+  .label-btn{ background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:var(--cream-dim); padding:10px 15px; border-radius:11px; font-size:12.5px; font-weight:700; letter-spacing:.04em; cursor:pointer; display:flex; align-items:center; gap:7px; }
+  .label-btn:hover{ color:var(--cream); background: rgba(255,255,255,.12); }
+  .label-btn.on{ color: var(--gold); border-color: rgba(219,165,63,.5); background: rgba(219,165,63,.1); }
+
+  /* overlays */
+  .overlay-backdrop{ position:fixed; inset:0; background: rgba(6,4,3,.72); backdrop-filter: blur(3px); z-index:200; display:none; align-items:flex-end; justify-content:center; animation: fadeBg .2s; }
+  .overlay-backdrop.show{ display:flex; }
+  @keyframes fadeBg{ from{opacity:0;} to{opacity:1;} }
+  @media (min-width: 860px){ .overlay-backdrop{ align-items:center; } }
+  .panel{ background: linear-gradient(180deg, #1c1512, #120d0b); border:1px solid rgba(255,255,255,.08); width:100%; max-width:760px; max-height:86vh; overflow:auto; border-radius: 20px 20px 0 0; padding:20px 18px 26px; box-shadow: 0 -20px 60px rgba(0,0,0,.5); animation: panelUp .28s var(--ease); }
+  @media (min-width: 860px){ .panel{ border-radius:20px; margin-bottom:0; } }
+  @keyframes panelUp{ from{ transform:translateY(24px); opacity:0;} to{transform:none; opacity:1;} }
+  .panel-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .panel-head h2{ margin:0; font-size:20px; font-style:italic; font-weight:600; }
+  .panel-close{ background:none; border:none; color:var(--cream-dim); font-size:20px; cursor:pointer; padding:6px; }
+  .panel-close:hover{ color:var(--cream); }
+  .tabs{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+  .tab{ background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); color:var(--cream-dim); padding:6px 12px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:.06em; cursor:pointer; text-transform:uppercase; }
+  .tab.active{ background: var(--brick); color:#fff; border-color: var(--brick-bright); }
+  .search-row{ position:relative; margin-bottom:14px; }
+  .search-row input{ width:100%; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:var(--cream); padding:11px 14px 11px 36px; border-radius:11px; font-size:13.5px; outline:none; }
+  .search-row input:focus{ border-color: var(--gold); }
+  .search-row span{ position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.6; }
+  .chan-list{ display:flex; flex-direction:column; gap:6px; }
+  .chan-row{ display:flex; align-items:center; gap:12px; padding:10px 10px; border-radius:12px; background: rgba(255,255,255,.03); border:1px solid transparent; cursor:pointer; transition: all .15s; }
+  .chan-row:hover{ background: rgba(255,255,255,.07); }
+  .chan-row.active{ border-color: rgba(219,165,63,.5); background: rgba(219,165,63,.08); }
+  .chan-row .num{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13px; color:var(--gold); width:34px; flex:none; }
+  .chan-row .logo{ width:36px; height:36px; border-radius:9px; flex:none; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; }
+  .chan-row .meta{ flex:1; min-width:0; }
+  .chan-row .meta .n{ font-weight:600; font-size:13.5px; }
+  .chan-row .meta .p{ font-size:11px; color:var(--cream-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .guide-grid{ display:flex; flex-direction:column; gap:14px; }
+  .guide-row{ display:flex; gap:12px; align-items:flex-start; }
+  .guide-row .gch{ width:96px; flex:none; padding-top:8px; }
+  .guide-row .gch .gnum{ font-family:'IBM Plex Mono',monospace; color:var(--gold); font-size:11px; }
+  .guide-row .gch .gnm{ font-weight:600; font-size:12.5px; }
+  .guide-track{ display:flex; gap:6px; overflow-x:auto; flex:1; padding-bottom:6px; }
+  .guide-slot{ flex:none; width:128px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); border-radius:10px; padding:8px 10px; cursor:pointer; }
+  .guide-slot.now{ border-color: var(--gold); background: rgba(219,165,63,.1); }
+  .guide-slot .tm{ font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--cream-dim); }
+  .guide-slot .tt{ font-size:12px; font-weight:600; margin-top:2px; }
+  .guide-slot.now::before{ content:"▲ NOW"; display:block; font-size:9px; color:var(--gold); font-weight:700; margin-bottom:4px; letter-spacing:.06em; }
+  .set-row{ display:flex; align-items:center; justify-content:space-between; padding:13px 4px; border-bottom:1px solid rgba(255,255,255,.06); }
+  .set-row:last-child{ border-bottom:none; }
+  .set-row .t{ font-size:13.5px; font-weight:600; }
+  .set-row .d{ font-size:11px; color:var(--cream-dim); margin-top:2px; }
+  .switch{ position:relative; width:42px; height:24px; flex:none; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .switch .track{ position:absolute; inset:0; background: rgba(255,255,255,.15); border-radius:999px; transition:.2s; cursor:pointer; }
+  .switch .track::before{ content:""; position:absolute; width:18px; height:18px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+  .switch input:checked + .track{ background: var(--brick); }
+  .switch input:checked + .track::before{ transform:translateX(18px); }
+
+  /* menu popover — Channels / TV Guide */
+  .menu-option{ display:flex; align-items:center; gap:12px; width:100%; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); color:var(--cream); padding:16px 18px; border-radius:14px; font-size:14.5px; font-weight:600; cursor:pointer; margin-bottom:10px; text-align:left; }
+  .menu-option:hover{ background: rgba(255,255,255,.09); }
+  .menu-option:last-child{ margin-bottom:0; }
+  .menu-option .ic{ font-size:20px; }
+
+  @media (max-width: 640px){
+    .watermark{ font-size:15px; }
+    .bug-tl .nm{ display:none; }
+    .now-pill{ max-width:52%; }
+    .now-pill .meta .t1, .now-pill .meta .t2{ max-width:120px; }
+    .next-tag{ display:none; }
+    .hint-box{ gap:18px; padding:18px 22px; }
+  }
+  @media (max-height: 620px){
+    .controls-bar{ padding:8px 2px 0; }
+    .icon-btn{ width:36px; height:36px; }
+  }
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+</style>
+</head>
+<body>
+
+  <div id="intro-black">
+    <div id="intro-text"><span class="caret"></span></div>
+  </div>
+
+  <div id="splash" role="img" aria-label="Nostalgia TV powering on">
+    <img id="splash-img" src="NostalgiaTV.png" alt="Nostalgia TV splash screen" />
+    <div class="splash-mark"><div class="tag">Nostalgia TV</div><h1>Turning on&nbsp;&hellip;</h1></div>
+  </div>
+  <div id="crt-boot"></div>
+  <div class="crt-line" id="crt-line"></div>
+
+  <div id="app">
+    <div class="tv-set crt-off" id="tv-set">
+      <div class="screen-shell" id="screen-shell">
+        <div class="screen-inner" id="screen-inner">
+          <canvas class="demo-canvas" id="demo-canvas"></canvas>
+          <div class="player-layer" id="player-layer"></div>
+
+          <div class="crt-layer">
+            <div class="crt-rgb"></div><div class="crt-scanlines"></div><div class="crt-vignette"></div><div class="crt-flicker"></div>
+          </div>
+
+          <div class="watermark"><span>Nostalgia</span><b>TV</b></div>
+
+          <div class="info-layer" id="info-layer">
+            <div class="bug-tl" id="bug-tl">
+              <span class="logo" id="bug-logo">D</span>
+              <span class="txt"><span class="num" id="bug-num">101</span><br/><span class="nm" id="bug-name">Doraemon</span></span>
+            </div>
+            <div class="bug-tr">
+              <span class="clk" id="clock">--:-- --</span>
+              <span class="live-pill"><span class="live-dot"></span>LIVE</span>
+            </div>
+            <div class="bug-bottom">
+              <div class="now-pill" id="now-pill">
+                <div class="thumb" id="pill-thumb">📺</div>
+                <div class="meta"><div class="t1" id="pill-title">Now Playing</div><div class="t2" id="pill-sub">&mdash;</div></div>
+              </div>
+              <div class="next-tag">NEXT: <b id="info-next">&mdash;</b></div>
+            </div>
+          </div>
+
+          <div id="hint-layer">
+            <div class="hint-box">
+              <div class="hint-item"><span class="hint-key">←</span><span class="hint-label">Prev<br/>channel</span></div>
+              <div class="hint-item"><span class="hint-key">→</span><span class="hint-label">Next<br/>channel</span></div>
+              <div class="hint-item"><span class="hint-swipe">👆↔</span><span class="hint-label">Swipe on<br/>phone</span></div>
+              <div class="hint-item"><span class="hint-key">F</span><span class="hint-label">Fullscreen</span></div>
+            </div>
+          </div>
+
+          <div class="static-layer" id="static-layer">
+            <canvas class="static-canvas" id="static-canvas"></canvas>
+            <div class="chan-card"><div class="num" id="static-num">101</div><div class="nm" id="static-name">Doraemon</div></div>
+          </div>
+
+          <div class="state-layer" id="state-unavailable">
+            <div class="icon">📺</div><h3>Channel unavailable</h3><p>This channel isn't broadcasting right now.</p>
+            <div class="row"><button class="btn primary" id="btn-retry">Try again</button><button class="btn" id="btn-goguide">Channel guide</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-bar">
+        <button class="ch-btn" id="btn-chdown" aria-label="Previous channel">◀ CH−</button>
+        <div class="mid-controls">
+          <button class="label-btn" id="btn-menu" title="Menu" aria-label="Menu">☰ Menu</button>
+          <button class="icon-btn" id="btn-mute" title="Mute / unmute" aria-label="Mute">🔊</button>
+          <button class="label-btn" id="btn-crt" title="Toggle CRT mode" aria-label="CRT mode">▦ CRT</button>
+          <button class="icon-btn" id="btn-settings" title="Settings" aria-label="Settings">⚙</button>
+        </div>
+        <button class="ch-btn" id="btn-chup" aria-label="Next channel">CH+ ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay-backdrop" id="ov-menu">
+    <div class="panel" role="dialog" aria-label="Menu" style="max-width:380px;">
+      <div class="panel-head"><h2>Menu</h2><button class="panel-close" data-close>✕</button></div>
+      <button class="menu-option" id="menu-channels"><span class="ic">📺</span> Channels</button>
+      <button class="menu-option" id="menu-guide"><span class="ic">🗓️</span> TV Guide</button>
+    </div>
+  </div>
+
+  <div class="overlay-backdrop" id="ov-browser">
+    <div class="panel" role="dialog" aria-label="Channel browser">
+      <div class="panel-head"><h2>Channels</h2><button class="panel-close" data-close>✕</button></div>
+      <div class="search-row"><span>🔍</span><input id="search-input" placeholder="Search channels or categories…" /></div>
+      <div class="tabs" id="cat-tabs"></div>
+      <div class="chan-list" id="chan-list"></div>
+    </div>
+  </div>
+
+  <div class="overlay-backdrop" id="ov-guide">
+    <div class="panel" role="dialog" aria-label="TV guide">
+      <div class="panel-head"><h2>TV Guide &middot; Today</h2><button class="panel-close" data-close>✕</button></div>
+      <div class="guide-grid" id="guide-grid"></div>
+    </div>
+  </div>
+
+  <div class="overlay-backdrop" id="ov-settings">
+    <div class="panel" role="dialog" aria-label="Settings" style="max-width:420px;">
+      <div class="panel-head"><h2>Settings</h2><button class="panel-close" data-close>✕</button></div>
+      <div id="settings-list"></div>
+    </div>
+  </div>
+
+<script src="channels.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* CHANNELS now comes from channels.js (window.NOSTALGIA_CHANNELS) */
+  var CHANNELS = window.NOSTALGIA_CHANNELS || [];
+  var CATEGORIES = ["ALL","KIDS","ACTION","COMEDY"];
+
+  var SLOT_MIN = 12;
+  function scheduleFor(channel, dateNow){
+    var minutesSinceMidnight = dateNow.getHours()*60 + dateNow.getMinutes();
+    var slotIndex = Math.floor(minutesSinceMidnight / SLOT_MIN);
+    var startOfCurrentSlot = slotIndex * SLOT_MIN;
+    var slots = [];
+    for (var i=-1;i<=2;i++){
+      var startMin = startOfCurrentSlot + i*SLOT_MIN;
+      var h = Math.floor(((startMin % 1440)+1440)%1440 / 60);
+      var m = ((startMin % 1440)+1440)%1440 % 60;
+      slots.push({ title: channel.name + " Episode", start: h.toString().padStart(2,'0')+":"+m.toString().padStart(2,'0'), offsetIndex:i });
+    }
+    return { slots: slots };
+  }
+
+  var state = {
+    currentIndex: 0,
+    settings: { crt:true, sounds:true, animations:true },
+    muted:false,
+    lastCategory:"ALL"
+  };
+
+  var els = {};
+  ["screen-shell","demo-canvas","player-layer","static-layer","static-canvas","static-num","static-name",
+   "state-unavailable","bug-tl","bug-logo","bug-num","bug-name","clock","info-layer",
+   "pill-title","pill-sub","pill-thumb","info-next","chan-list","cat-tabs","search-input","guide-grid",
+   "settings-list","tv-set","btn-crt","btn-mute","hint-layer"].forEach(function(id){
+    els[id]=document.getElementById(id);
+  });
+
+  function currentChannel(){ return CHANNELS[state.currentIndex]; }
+
+  /* ---------- synthesized TV sounds (no copyrighted audio) ---------- */
+  var actx = null;
+  function audioCtx(){ if(!actx){ try{ actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return actx; }
+  function beep(freq, dur, type, gain){
+    if(!state.settings.sounds) return;
+    var ctx = audioCtx(); if(!ctx) return;
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type||"sine"; o.frequency.value = freq; g.gain.value = 0;
+    o.connect(g); g.connect(ctx.destination);
+    var t = ctx.currentTime;
+    g.gain.linearRampToValueAtTime(gain||0.05, t+0.01);
+    g.gain.linearRampToValueAtTime(0, t+(dur||0.12));
+    o.start(t); o.stop(t+(dur||0.12)+0.02);
+  }
+  function noiseBurst(dur){
+    if(!state.settings.sounds) return;
+    var ctx = audioCtx(); if(!ctx) return;
+    var bufferSize = ctx.sampleRate * (dur||0.25);
+    var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    var data = buffer.getChannelData(0);
+    for(var i=0;i<bufferSize;i++){ data[i] = (Math.random()*2-1) * (1 - i/bufferSize); }
+    var src = ctx.createBufferSource(); src.buffer = buffer;
+    var g = ctx.createGain(); g.gain.value = 0.06;
+    src.connect(g); g.connect(ctx.destination); src.start();
+  }
+  function sndChannelChange(){ noiseBurst(0.22); beep(180,0.08,"square",0.03); }
+  function sndClick(){ beep(700,0.04,"sine",0.03); }
+  function sndStartup(){ beep(220,0.5,"sine",0.04); }
+
+  /* ---------- INTRO: typing text on black, then splash, then TV ---------- */
+  function runIntro(){
+    var introEl = document.getElementById("intro-black");
+    var textEl = document.getElementById("intro-text");
+    var msg = "Welcome, it's 2012 again.....";
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function finishIntro(){
+      introEl.classList.add("fade-out");
+      setTimeout(function(){ introEl.style.display="none"; runSplash(); }, 450);
+    }
+
+    if(reduced){
+      textEl.innerHTML = msg + '<span class="caret"></span>';
+      setTimeout(finishIntro, 500);
+      return;
+    }
+
+    var i = 0;
+    var typeSpeed = 80;
+    function typeChar(){
+      if(i <= msg.length){
+        textEl.innerHTML = msg.slice(0,i) + '<span class="caret"></span>';
+        i++;
+        setTimeout(typeChar, typeSpeed);
+      }
+    }
+    typeChar();
+    setTimeout(finishIntro, 3000);
+  }
+
+  function runSplash(){
+    var splash = document.getElementById("splash");
+    var app = document.getElementById("app");
+    var crtBoot = document.getElementById("crt-boot");
+    var crtLine = document.getElementById("crt-line");
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    splash.classList.add("run");
+    var dur = reduced ? 400 : 2000;
+    setTimeout(function(){
+      splash.classList.add("fade-out");
+      crtBoot.classList.add("flash");
+      crtLine.classList.add("boot");
+      sndStartup();
+      setTimeout(function(){
+        splash.style.display="none";
+        app.classList.add("visible");
+        els["tv-set"].classList.add("boot");
+        setTimeout(function(){
+          loadCurrentChannel();
+          armAutoHide();
+          showHintOnce();
+        }, 260);
+      }, reduced?100:180);
+    }, dur);
+  }
+
+  function showHintOnce(){
+    els["hint-layer"].classList.add("show");
+    setTimeout(function(){ els["hint-layer"].classList.remove("show"); }, 2000);
+  }
+
+  /* ---------- auto-hide info overlay (watermark stays persistent) ---------- */
+  var hideTimer = null;
+  function armAutoHide(){
+    els["info-layer"].classList.remove("hidden");
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function(){ els["info-layer"].classList.add("hidden"); }, 5000);
+  }
+  ["mousemove","touchstart","keydown","click"].forEach(function(evt){
+    document.addEventListener(evt, function(){
+      armAutoHide();
+      /* safety net: if the player is stuck (autoplay blocked pre-gesture),
+         any real user interaction is a valid gesture to retry playback */
+      if(ytPlayer){
+        try{
+          var st = ytPlayer.getPlayerState();
+          if(st !== 1){ if(!state.muted) ytPlayer.unMute(); ytPlayer.playVideo(); }
+        }catch(e){}
+      }
+    }, {passive:true});
+  });
+
+  /* ---------- swipe to change channels (mobile) ---------- */
+  (function(){
+    var touchStartX = null;
+    document.addEventListener("touchstart", function(e){ touchStartX = e.changedTouches[0].clientX; }, {passive:true});
+    document.addEventListener("touchend", function(e){
+      if(touchStartX===null) return;
+      var dx = e.changedTouches[0].clientX - touchStartX;
+      if(Math.abs(dx) > 40){ dx < 0 ? tuneTo(state.currentIndex+1) : tuneTo(state.currentIndex-1); }
+      touchStartX = null;
+    }, {passive:true});
+  })();
+
+  /* ---------- clock ---------- */
+  function tickClock(){
+    var d = new Date();
+    var h = d.getHours(); var ap = h>=12?"PM":"AM"; var h12 = h%12; if(h12===0)h12=12;
+    var m = d.getMinutes().toString().padStart(2,'0');
+    els.clock.textContent = h12+":"+m+" "+ap;
+    updateProgramInfo();
+  }
+  setInterval(tickClock, 1000);
+
+  /* ---------- demo placeholder (only used if a channel has no playlist) ---------- */
+  var demoRAF = null;
+  function drawDemoChannel(canvas, channel){
+    var ctx = canvas.getContext("2d");
+    function resize(){ canvas.width = canvas.clientWidth * devicePixelRatio; canvas.height = canvas.clientHeight * devicePixelRatio; }
+    resize(); window.addEventListener("resize", resize);
+    var t0 = performance.now(); var color = channel.colorTheme || "#a5311f";
+    function frame(now){
+      var t = (now-t0)/1000; var w = canvas.width, h = canvas.height;
+      ctx.clearRect(0,0,w,h);
+      var grad = ctx.createLinearGradient(0,0,w,h);
+      grad.addColorStop(0, shade(color,-30)); grad.addColorStop(0.5+Math.sin(t*0.15)*0.08, color); grad.addColorStop(1, shade(color,30));
+      ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+      for(var i=0;i<4;i++){
+        var ang = t*0.2 + i*(Math.PI/2);
+        var cx = w/2 + Math.cos(ang)*w*0.28, cy = h/2 + Math.sin(ang*1.3)*h*0.22, r = Math.min(w,h)*0.16;
+        var rg = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+        rg.addColorStop(0,"rgba(255,255,255,0.16)"); rg.addColorStop(1,"rgba(255,255,255,0)");
+        ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+      }
+      ctx.save(); ctx.globalAlpha=.9; ctx.fillStyle="#fff";
+      ctx.font = "700 "+Math.round(h*0.075)+"px 'IBM Plex Mono', monospace"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText(channel.name.toUpperCase(), w/2, h*0.46);
+      ctx.font = Math.round(h*0.026)+"px 'IBM Plex Sans', sans-serif"; ctx.globalAlpha=.5;
+      ctx.fillText("PLAYLIST NOT YET CONNECTED", w/2, h*0.56);
+      ctx.restore();
+      demoRAF = requestAnimationFrame(frame);
+    }
+    if(demoRAF) cancelAnimationFrame(demoRAF);
+    demoRAF = requestAnimationFrame(frame);
+  }
+  function shade(hex, amt){
+    var c = hex.replace('#',''); var num = parseInt(c,16);
+    var r = Math.min(255,Math.max(0,(num>>16)+amt)), g = Math.min(255,Math.max(0,((num>>8)&0xff)+amt)), b = Math.min(255,Math.max(0,(num&0xff)+amt));
+    return "rgb("+r+","+g+","+b+")";
+  }
+  function drawStaticNoise(canvas, ms){
+    var ctx = canvas.getContext("2d"); canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+    var start = performance.now();
+    function frame(now){
+      var id = ctx.createImageData(canvas.width, canvas.height);
+      for(var i=0;i<id.data.length;i+=4){ var v = Math.random()*255; id.data[i]=v; id.data[i+1]=v; id.data[i+2]=v; id.data[i+3]=255; }
+      ctx.putImageData(id,0,0);
+      if(now-start < ms) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---------- YouTube provider (official IFrame API) ---------- */
+  var ytReady = false, ytQueue = [];
+  window.onYouTubeIframeAPIReady = function(){ ytReady = true; ytQueue.forEach(function(fn){fn();}); ytQueue=[]; };
+  (function loadYT(){ var tag=document.createElement('script'); tag.src="https://www.youtube.com/iframe_api"; document.head.appendChild(tag); })();
+  var ytPlayer = null;
+  function whenYTReady(cb){ if(ytReady) cb(); else ytQueue.push(cb); }
+
+  var EPISODE_MIN = 13; // rough average episode length in minutes — tune per feel
+  var EPISODE_GUESS_COUNT = 60;
+  function liveOffsetFor(channel){
+    var now = new Date();
+    var totalMinutes = now.getHours()*60 + now.getMinutes() + now.getSeconds()/60;
+    var slot = Math.floor(totalMinutes / EPISODE_MIN);
+    var index = slot % EPISODE_GUESS_COUNT;
+    var startSeconds = Math.floor((totalMinutes - slot*EPISODE_MIN) * 60);
+    return { index: index, startSeconds: startSeconds };
+  }
+
+  /* silently retries playback a few times — no visible UI, just resilience */
+  function ensurePlaying(player, attempt){
+    attempt = attempt || 0;
+    try{
+      var st = player.getPlayerState();
+      if(st !== 1){
+        if(!state.muted) player.unMute();
+        player.playVideo();
+      }
+    }catch(e){}
+    if(attempt < 6){ setTimeout(function(){ ensurePlaying(player, attempt+1); }, 500); }
+  }
+
+  function loadYouTubeChannel(channel) {
+  els["demo-canvas"].style.display = "none";
+  els["player-layer"].style.display = "block";
+
+  // Hide the player until YouTube actually starts playing.
+  els["player-layer"].style.opacity = "0";
+  els["player-layer"].innerHTML = '<div id="yt-mount"></div>';
+
+  whenYTReady(function () {
+    try {
+      var off = liveOffsetFor(channel);
+
+      ytPlayer = new YT.Player("yt-mount", {
+        playerVars: {
+          listType: "playlist",
+          list: channel.playlistId,
+          index: off.index || 0,
+
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          rel: 0,
+          modestbranding: 1,
+          iv_load_policy: 3,
+          cc_load_policy: 0,
+          playsinline: 1,
+          mute: 1,
+          autoplay: 1
+        },
+
+        events: {
+          onReady: function (e) {
+            try {
+              e.target.unloadModule("captions");
+
+              if (!state.muted) {
+                e.target.unMute();
+              }
+
+              // Start playback from the required position.
+              if (off.startSeconds > 0) {
+                e.target.seekTo(off.startSeconds, true);
+              }
+
+              e.target.playVideo();
+            } catch (err) {
+              showState("state-unavailable");
+            }
+          },
+
+          onStateChange: function (e) {
+            try {
+              e.target.unloadModule("captions");
+            } catch (err) {}
+
+            // Only reveal the player when playback actually starts.
+            if (e.data === YT.PlayerState.PLAYING) {
+              els["player-layer"].style.opacity = "1";
+            }
+
+            // If buffering, keep the error screen hidden.
+            if (e.data === YT.PlayerState.BUFFERING) {
+              els["player-layer"].style.opacity = "1";
+            }
+          },
+
+          onError: function (e) {
+            console.log("YouTube error:", e.data);
+
+            // Don't immediately show the YouTube error screen.
+            // Give the playlist a moment to initialize.
+            setTimeout(function () {
+              try {
+                if (
+                  ytPlayer &&
+                  typeof ytPlayer.getPlayerState === "function"
+                ) {
+                  var playerState = ytPlayer.getPlayerState();
+
+                  if (
+                    playerState !== YT.PlayerState.PLAYING &&
+                    playerState !== YT.PlayerState.BUFFERING
+                  ) {
+                    showState("state-unavailable");
+                  }
+                }
+              } catch (err) {
+                showState("state-unavailable");
+              }
+            }, 1500);
+          }
+        }
+      });
+
+    } catch (err) {
+      console.error(err);
+      showState("state-unavailable");
+    }
+  });
+}
+    
+  function destroyYouTube(){ try{ if(ytPlayer && ytPlayer.destroy) ytPlayer.destroy(); }catch(e){} ytPlayer=null; els["player-layer"].innerHTML=""; }
+
+  function hideAllStates(){ els["state-unavailable"].classList.remove("show"); }
+  function showState(id){ hideAllStates(); document.getElementById(id).classList.add("show"); }
+
+  function loadCurrentChannel(){
+    var channel = currentChannel();
+    hideAllStates();
+    if(demoRAF) cancelAnimationFrame(demoRAF);
+    destroyYouTube();
+    if(channel.provider==="youtube" && channel.playlistId){
+      els["demo-canvas"].style.display = "none";
+      loadYouTubeChannel(channel);
+    } else {
+      els["player-layer"].style.display = "none";
+      els["demo-canvas"].style.display = "block";
+      drawDemoChannel(els["demo-canvas"], channel);
+    }
+  }
+
+  /* ---------- channel switching / static transition ---------- */
+  var switching = false;
+  function tuneTo(index){
+    if(switching || !CHANNELS.length) return;
+    index = ((index % CHANNELS.length) + CHANNELS.length) % CHANNELS.length;
+    var channel = CHANNELS[index];
+    switching = true;
+    if(demoRAF) cancelAnimationFrame(demoRAF);
+    destroyYouTube();
+    hideAllStates();
+
+    if(state.settings.animations){
+      els["static-num"].textContent = channel.number;
+      els["static-name"].textContent = channel.name;
+      els["static-layer"].classList.add("active");
+      drawStaticNoise(els["static-canvas"], 380);
+      sndChannelChange();
+    }
+    setTimeout(function(){
+      state.currentIndex = index;
+      loadCurrentChannel();
+      renderInfoBar();
+      renderBrowserList();
+      armAutoHide();
+      var dur = state.settings.animations ? 420 : 0;
+      setTimeout(function(){ els["static-layer"].classList.remove("active"); switching=false; }, dur);
+    }, state.settings.animations ? 420 : 20);
+  }
+
+  /* ---------- info render ---------- */
+  function renderInfoBar(){
+    var ch = currentChannel(); if(!ch) return;
+    els["bug-num"].textContent = ch.number;
+    els["bug-name"].textContent = ch.name;
+    els["bug-logo"].textContent = ch.name.charAt(0);
+    els["bug-logo"].style.background = ch.colorTheme;
+    els["pill-thumb"].style.background = ch.colorTheme;
+    els["btn-mute"].textContent = state.muted ? "🔇" : "🔊";
+    updateProgramInfo();
+  }
+  function updateProgramInfo(){
+    var ch = currentChannel(); if(!ch) return;
+    var sched = scheduleFor(ch, new Date());
+    var next = sched.slots.filter(function(s){return s.offsetIndex===1;})[0];
+    document.getElementById("info-next").textContent = next ? next.title : ch.name+" continues";
+    els["pill-title"].textContent = ch.name;
+    els["pill-sub"].textContent = "CH " + ch.number + " · " + ch.hindi;
+  }
+
+  /* ---------- browser list ---------- */
+  function renderTabs(){
+    els["cat-tabs"].innerHTML = "";
+    CATEGORIES.forEach(function(cat){
+      var b = document.createElement("button");
+      b.className = "tab" + (state.lastCategory===cat ? " active":"");
+      b.textContent = cat === "ALL" ? "All" : (cat.charAt(0)+cat.slice(1).toLowerCase());
+      b.onclick = function(){ state.lastCategory = cat; renderTabs(); renderBrowserList(); };
+      els["cat-tabs"].appendChild(b);
+    });
+  }
+  function renderBrowserList(){
+    var q = (els["search-input"].value||"").toLowerCase().trim();
+    var cat = state.lastCategory;
+    els["chan-list"].innerHTML = "";
+    CHANNELS.forEach(function(ch, idx){
+      if(cat!=="ALL" && ch.category.toUpperCase()!==cat) return;
+      var haystack = (ch.name+" "+ch.category+" "+ch.hindi).toLowerCase();
+      if(q && haystack.indexOf(q)===-1) return;
+      var row = document.createElement("div");
+      row.className = "chan-row" + (idx===state.currentIndex ? " active":"");
+      row.innerHTML =
+        '<span class="num">'+ch.number+'</span>'+
+        '<span class="logo" style="background:'+ch.colorTheme+'">'+ch.name.charAt(0)+'</span>'+
+        '<span class="meta"><div class="n">'+ch.name+' <span style="font-weight:400;color:var(--cream-dim);font-size:11px;">'+ch.hindi+'</span></div><div class="p">'+ch.category+'</div></span>';
+      row.onclick = function(){ tuneTo(idx); closeAllOverlays(); };
+      els["chan-list"].appendChild(row);
+    });
+    if(!els["chan-list"].children.length){
+      els["chan-list"].innerHTML = '<p style="color:var(--cream-dim); font-size:13px; padding:10px;">No channels match your search.</p>';
+    }
+  }
+  els["search-input"].addEventListener("input", renderBrowserList);
+
+  /* ---------- guide ---------- */
+  function renderGuide(){
+    els["guide-grid"].innerHTML = "";
+    CHANNELS.forEach(function(ch){
+      var sched = scheduleFor(ch, new Date());
+      var row = document.createElement("div"); row.className = "guide-row";
+      var logo = '<span class="logo" style="width:30px;height:30px;border-radius:8px;background:'+ch.colorTheme+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">'+ch.name.charAt(0)+'</span>';
+      row.innerHTML = '<div class="gch">'+logo+'<div><div class="gnum">CH '+ch.number+'</div><div class="gnm">'+ch.name+'</div></div></div>';
+      var track = document.createElement("div"); track.className = "guide-track";
+      sched.slots.forEach(function(s){
+        var slot = document.createElement("div");
+        slot.className = "guide-slot" + (s.offsetIndex===0 ? " now":"");
+        slot.innerHTML = '<div class="tm">'+s.start+'</div><div class="tt">'+s.title+'</div>';
+        slot.onclick = function(){ var idx=CHANNELS.indexOf(ch); tuneTo(idx); closeAllOverlays(); };
+        track.appendChild(slot);
+      });
+      row.appendChild(track);
+      els["guide-grid"].appendChild(row);
+    });
+  }
+
+  /* ---------- settings ---------- */
+  var SETTINGS_META = [
+    {key:"sounds", label:"TV Sounds", desc:"Channel change, remote clicks & static"},
+    {key:"animations", label:"Animations", desc:"Static transitions & motion"}
+  ];
+  function renderSettings(){
+    els["settings-list"].innerHTML = "";
+    SETTINGS_META.forEach(function(m){
+      var row = document.createElement("div"); row.className = "set-row";
+      row.innerHTML = '<div><div class="t">'+m.label+'</div><div class="d">'+m.desc+'</div></div>'+
+        '<label class="switch"><input type="checkbox" '+(state.settings[m.key]?'checked':'')+' data-set="'+m.key+'"/><span class="track"></span></label>';
+      els["settings-list"].appendChild(row);
+    });
+    els["settings-list"].querySelectorAll("input[data-set]").forEach(function(inp){
+      inp.addEventListener("change", function(){ state.settings[inp.getAttribute("data-set")] = inp.checked; });
+    });
+  }
+  function applyCRT(){
+    els["tv-set"].classList.toggle("crt-on", state.settings.crt);
+    els["tv-set"].classList.toggle("crt-off", !state.settings.crt);
+    els["btn-crt"].classList.toggle("on", state.settings.crt);
+  }
+
+  document.getElementById("btn-retry").addEventListener("click", function(){ tuneTo(state.currentIndex); });
+  document.getElementById("btn-goguide").addEventListener("click", function(){ closeAllOverlays(); openOverlay("guide"); });
+
+  /* ---------- overlays ---------- */
+  var overlayIds = { menu:"ov-menu", browser:"ov-browser", guide:"ov-guide", settings:"ov-settings" };
+  function openOverlay(name){
+    closeAllOverlays();
+    var el = document.getElementById(overlayIds[name]); if(!el) return;
+    el.classList.add("show");
+    if(name==="browser") renderBrowserList();
+    if(name==="guide") renderGuide();
+    if(name==="settings") renderSettings();
+  }
+  function closeAllOverlays(){ Object.keys(overlayIds).forEach(function(k){ document.getElementById(overlayIds[k]).classList.remove("show"); }); }
+  document.querySelectorAll("[data-close]").forEach(function(b){ b.addEventListener("click", closeAllOverlays); });
+  document.querySelectorAll(".overlay-backdrop").forEach(function(bd){ bd.addEventListener("click", function(e){ if(e.target===bd) closeAllOverlays(); }); });
+
+  document.getElementById("btn-menu").addEventListener("click", function(){ openOverlay("menu"); });
+  document.getElementById("menu-channels").addEventListener("click", function(){ openOverlay("browser"); });
+  document.getElementById("menu-guide").addEventListener("click", function(){ openOverlay("guide"); });
+  document.getElementById("btn-settings").addEventListener("click", function(){ openOverlay("settings"); });
+
+  /* ---------- top-level controls ---------- */
+  document.getElementById("btn-chup").addEventListener("click", function(){ tuneTo(state.currentIndex+1); });
+  document.getElementById("btn-chdown").addEventListener("click", function(){ tuneTo(state.currentIndex-1); });
+  els["btn-crt"].addEventListener("click", function(){ state.settings.crt=!state.settings.crt; applyCRT(); });
+  function toggleMute(){
+    state.muted = !state.muted;
+    els["btn-mute"].textContent = state.muted ? "🔇" : "🔊";
+    if(ytPlayer){ try{ state.muted ? ytPlayer.mute() : ytPlayer.unMute(); }catch(e){} }
+  }
+  els["btn-mute"].addEventListener("click", toggleMute);
+
+  function toggleFullscreen(){
+    var el = els["screen-shell"];
+    if(!document.fullscreenElement){ el.requestFullscreen && el.requestFullscreen(); }
+    else { document.exitFullscreen && document.exitFullscreen(); }
+  }
+
+  /* ---------- keyboard (channel + UI nav only — no seek keys) ---------- */
+  document.addEventListener("keydown", function(e){
+    var tag = (document.activeElement && document.activeElement.tagName) || "";
+    if(tag==="INPUT" || tag==="TEXTAREA") return;
+    switch(e.key){
+      case "ArrowLeft": tuneTo(state.currentIndex-1); break;
+      case "ArrowRight": tuneTo(state.currentIndex+1); break;
+      case "ArrowUp": tuneTo(state.currentIndex-1); break;
+      case "ArrowDown": tuneTo(state.currentIndex+1); break;
+      case "f": case "F": toggleFullscreen(); break;
+      case "m": case "M": toggleMute(); break;
+      case "Escape": closeAllOverlays(); break;
+    }
+  });
+
+  /* ---------- init ---------- */
+  function init(){
+    renderTabs();
+    applyCRT();
+    renderInfoBar();
+    tickClock();
+    runIntro();
+  }
+  init();
+})();
+</script>
+</body>
+</html>

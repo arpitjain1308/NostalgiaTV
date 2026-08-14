@@ -10,7 +10,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='16' width='56' height='38' rx='7' fill='%230c0a08'/%3E%3Crect x='9' y='21' width='46' height='28' rx='4' fill='%23a5311f'/%3E%3Crect x='13' y='25' width='38' height='20' rx='2' fill='%23dba53f'/%3E%3Cpath d='M20 10 L28 16 M44 10 L36 16' stroke='%230c0a08' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='50' cy='53' r='2.4' fill='%23dba53f'/%3E%3Ccircle cx='56' cy='53' r='2.4' fill='%23dba53f'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600;1,9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+Devanagari:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600;1,9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+Devanagari:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bezel-0:#0c0a08; --bezel-1:#1c1512; --bezel-2:#241a15;
@@ -36,30 +36,30 @@
   #intro-black{
     position:fixed; inset:0; z-index:10000; background:#000;
     display:flex; align-items:center; justify-content:center;
-    transition: opacity .45s linear;
+    transition: opacity .4s linear;
   }
   #intro-black.fade-out{ opacity:0; pointer-events:none; }
   #intro-text{
-    color:#fff; font-family:'IBM Plex Mono', monospace;
-    font-size: clamp(16px,3.6vw,32px); letter-spacing:.02em; text-align:center; padding:0 20px;
+    color:#fff; font-family:'Baloo 2', sans-serif; font-weight:700;
+    font-size: clamp(18px,4vw,34px); letter-spacing:.01em; text-align:center; padding:0 20px;
   }
-  .caret{ display:inline-block; width:2px; height:1em; background:#fff; margin-left:3px; vertical-align:-2px; animation: caretBlink 0.9s steps(1) infinite; }
+  .caret{ display:inline-block; width:3px; height:1em; background:#fff; margin-left:3px; vertical-align:-3px; animation: caretBlink 0.85s steps(1) infinite; border-radius:2px; }
   @keyframes caretBlink{ 50%{ opacity:0; } }
 
-  /* ---------- SPLASH (no zoom — flash-in only) ---------- */
-  #splash{ position:fixed; inset:0; z-index:9999; background:#000; display:flex; align-items:center; justify-content:center; }
-  #splash img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; }
+  /* ---------- SPLASH (gentle zoom, "turning on" line at bottom-middle) ---------- */
+  #splash{ position:fixed; inset:0; z-index:9999; background:#000; display:flex; align-items:flex-end; justify-content:center; }
+  #splash img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transform:scale(1); transform-origin:center; }
   #splash.run img{ animation: splashIn 2s var(--ease) forwards; }
   #splash::after{ content:""; position:absolute; inset:0; background: radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(0,0,0,.55) 100%); pointer-events:none; }
-  #splash .splash-mark{ position:relative; z-index:2; text-align:center; opacity:0; }
+  #splash .splash-mark{ position:relative; z-index:2; text-align:center; opacity:0; margin-bottom:9vh; }
   #splash.run .splash-mark{ animation: markIn 2s var(--ease) forwards; }
   #splash .splash-mark .tag{ font-family:'IBM Plex Mono', monospace; letter-spacing:.35em; font-size:11px; color: var(--gold); text-transform:uppercase; margin-bottom:10px; }
-  #splash .splash-mark h1{ font-size: clamp(28px, 6vw, 58px); font-style:italic; font-weight:600; margin:0; color:#fff; text-shadow: 0 4px 30px rgba(0,0,0,.6); }
+  #splash .splash-mark h1{ font-size: clamp(22px, 4.4vw, 40px); font-style:italic; font-weight:600; margin:0; color:#fff; text-shadow: 0 4px 30px rgba(0,0,0,.6); }
   @keyframes splashIn{
-    0%{ opacity:0; filter: brightness(0) saturate(1.05) contrast(1.05); }
+    0%{ opacity:0; transform:scale(1.0); filter: brightness(0) saturate(1.05) contrast(1.05); }
     8%{ filter: brightness(2.2) saturate(1.05) contrast(1.05); }
-    22%{ opacity:1; filter: brightness(1) saturate(1.05) contrast(1.05); }
-    100%{ opacity:1; }
+    22%{ opacity:1; filter: brightness(1) saturate(1.05) contrast(1.05); transform:scale(1.015); }
+    100%{ opacity:1; transform:scale(1.06); }
   }
   @keyframes markIn{ 0%,15%{opacity:0; transform:translateY(8px);} 35%{opacity:1; transform:translateY(0);} 88%{opacity:1;} 100%{opacity:0;} }
   #splash.fade-out{ opacity:0; transition: opacity .35s linear; pointer-events:none; }
@@ -84,31 +84,40 @@
   #app{ opacity:0; height:100%; max-width:1620px; margin:0 auto; padding: 8px; display:flex; flex-direction:column; min-height:0; }
   #app.visible{ opacity:1; transition: opacity .25s linear; }
 
-  /* CRT television casing */
+  /* ---------- authentic CRT television casing ---------- */
   .tv-set{
-    background: linear-gradient(160deg, #2a1f19, #0c0a08 65%);
-    border-radius: 26px; padding: 12px;
-    box-shadow: var(--shadow-deep), inset 0 2px 0 rgba(255,255,255,.06), inset 0 -2px 0 rgba(0,0,0,.4);
-    border: 1px solid rgba(255,255,255,.07);
+    background: radial-gradient(120% 160% at 30% -10%, #3a2a20, #1c140f 55%, #0a0806 100%);
+    border-radius: 34px; padding: 16px 16px 22px;
+    box-shadow: var(--shadow-deep), inset 0 2px 0 rgba(255,255,255,.08), inset 0 -3px 0 rgba(0,0,0,.5), 0 0 0 1px rgba(0,0,0,.6);
+    border: 1px solid rgba(255,255,255,.06);
     position:relative; flex:1; min-height:0; display:flex; flex-direction:column;
   }
-  .tv-set::before{ content:""; position:absolute; inset:0; border-radius:26px; pointer-events:none; background: repeating-linear-gradient(115deg, rgba(255,255,255,.018) 0 2px, transparent 2px 6px); mix-blend-mode: overlay; }
+  .tv-set::before{ content:""; position:absolute; inset:0; border-radius:34px; pointer-events:none; background: repeating-linear-gradient(115deg, rgba(255,255,255,.02) 0 2px, transparent 2px 7px); mix-blend-mode: overlay; }
   .tv-set.boot{ animation: tvBoot .5s var(--ease) .05s both; }
   @keyframes tvBoot{ 0%{ filter:brightness(4) contrast(1.3); } 55%{ filter:brightness(1.4); } 100%{ filter:brightness(1); } }
 
-  /* screen -- fills remaining space, recessed like a CRT tube */
+  /* power LED + speaker grille — small physical-TV details */
+  .tv-led{ position:absolute; bottom:9px; right:22px; width:7px; height:7px; border-radius:50%; background:#e0402c; box-shadow:0 0 6px 1px #e0402c, 0 0 1px rgba(0,0,0,.6); animation:pulse 2.4s infinite; z-index:3; }
+  .tv-grille{ position:absolute; bottom:8px; left:22px; width:70px; height:9px; z-index:3;
+    background-image: radial-gradient(circle, rgba(0,0,0,.55) 1.1px, transparent 1.2px);
+    background-size: 7px 7px; opacity:.7;
+  }
+
+  /* screen -- fills remaining space, recessed + slightly curved like a CRT tube */
   .screen-shell{
-    position:relative; border-radius: 18px; overflow:hidden; background:#000; width:100%; flex:1; min-height:0;
-    box-shadow: inset 0 0 0 3px rgba(0,0,0,.55), inset 0 0 0 4px rgba(255,255,255,.04), inset 0 0 70px rgba(0,0,0,.7);
+    position:relative; border-radius: 26px; overflow:hidden; background:#000; width:100%; flex:1; min-height:0;
+    box-shadow: inset 0 0 0 3px rgba(0,0,0,.6), inset 0 0 0 5px rgba(255,255,255,.05), inset 0 0 90px rgba(0,0,0,.75);
   }
   .screen-inner{ position:absolute; inset:0; }
   .demo-canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
-  .player-layer{ position:absolute; inset:0; width:100%; height:100%; }
+  .player-layer{ position:absolute; inset:0; width:100%; height:100%; transition: opacity .25s linear; }
   .player-layer iframe{ width:100%; height:100%; border:0; display:block; pointer-events:none; }
-  /* permanent subtle glass reflection, independent of CRT toggle */
+  /* curved-glass highlight, always on regardless of CRT toggle */
   .screen-shell::after{
     content:""; position:absolute; inset:0; pointer-events:none; z-index:6;
-    background: radial-gradient(140% 90% at 20% -10%, rgba(255,255,255,.06), transparent 45%);
+    background:
+      radial-gradient(160% 100% at 18% -15%, rgba(255,255,255,.09), transparent 42%),
+      radial-gradient(120% 90% at 85% 115%, rgba(0,0,0,.35), transparent 50%);
   }
 
   /* persistent watermark logo — bottom-left, always visible */
@@ -124,27 +133,30 @@
   .info-layer.hidden{ opacity:0; }
   .info-layer *{ pointer-events:none; }
 
-  /* channel badge — now top-left, where the logo used to be */
-  .bug-tl{ position:absolute; top:16px; left:16px; display:flex; align-items:center; gap:10px; background: rgba(10,7,5,.48); backdrop-filter: blur(3px); padding:8px 15px 8px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.1); }
-  .bug-tl .logo{ width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; flex:none; }
+  .bug-tl{ position:absolute; top:16px; left:16px; display:flex; align-items:center; gap:11px; background: rgba(10,7,5,.48); backdrop-filter: blur(3px); padding:9px 18px 9px 9px; border-radius:999px; border:1px solid rgba(255,255,255,.1); }
+  .bug-tl .logo{ width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:19px; font-weight:700; color:#fff; flex:none; }
   .bug-tl .txt{ line-height:1.1; }
-  .bug-tl .num{ font-family:'IBM Plex Mono',monospace; font-size:16px; color:var(--gold); font-weight:600; }
-  .bug-tl .nm{ font-size:16px; font-weight:700; }
-
+  .bug-tl .num{ font-family:'IBM Plex Mono',monospace; font-size:18px; color:var(--gold); font-weight:600; }
+  .bug-tl .nm{ font-size:18px; font-weight:700; }
   .bug-tr{ position:absolute; top:16px; right:16px; display:flex; align-items:center; gap:10px; }
   .bug-tr .clk{ font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--cream-dim); background: rgba(10,7,5,.45); backdrop-filter: blur(3px); padding:8px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.1); }
   .live-pill{ display:flex; align-items:center; gap:7px; background: rgba(192,57,43,.22); border:1px solid rgba(192,57,43,.5); color:#f0897c; font-size:11.5px; font-weight:700; padding:8px 14px 8px 10px; border-radius:999px; letter-spacing:.08em; backdrop-filter: blur(3px); }
   .live-dot{ width:7px; height:7px; border-radius:50%; background:#e0402c; box-shadow:0 0 8px #e0402c; animation:pulse 1.6s infinite; }
   @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
 
-  .bug-bottom{ position:absolute; left:0; right:0; bottom:0; padding: 30px 16px 14px; display:flex; align-items:center; justify-content:flex-end; gap:14px; background: linear-gradient(180deg, transparent, rgba(6,4,3,.8) 60%, rgba(6,4,3,.9)); flex-wrap:wrap; }
-  .now-pill{ display:flex; align-items:center; gap:11px; min-width:0; background: linear-gradient(100deg, rgba(165,49,31,.88), rgba(60,20,14,.7)); border:1px solid rgba(255,255,255,.14); border-radius: 999px; padding:7px 16px 7px 7px; box-shadow: 0 10px 26px rgba(0,0,0,.35); max-width:60%; }
-  .now-pill .thumb{ width:34px; height:34px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:15px; }
+  /* channel + next-episode info — bottom middle, bigger */
+  .bug-bottom{
+    position:absolute; left:0; right:0; bottom:0; padding: 34px 16px 16px;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:9px;
+    background: linear-gradient(180deg, transparent, rgba(6,4,3,.82) 55%, rgba(6,4,3,.92));
+  }
+  .now-pill{ display:flex; align-items:center; gap:16px; min-width:340px; background: linear-gradient(100deg, rgba(165,49,31,.9), rgba(60,20,14,.72)); border:1px solid rgba(255,255,255,.15); border-radius: 999px; padding:9px 32px 9px 9px; box-shadow: 0 12px 30px rgba(0,0,0,.4); max-width:92%; }
+  .now-pill .thumb{ width:40px; height:40px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:18px; }
   .now-pill .meta{ min-width:0; }
-  .now-pill .meta .t1{ font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:250px; }
-  .now-pill .meta .t2{ font-size:10.5px; color:var(--cream-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:250px; }
-  .next-tag{ font-size:12px; color: var(--cream-dim); white-space:nowrap; }
-  .next-tag b{ color:var(--cream); font-weight:600; }
+  .now-pill .meta .t1{ font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:340px; }
+  .now-pill .meta .t2{ font-size:12px; color:var(--cream-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:340px; }
+  .next-tag{ font-size:13.5px; color: var(--cream-dim); white-space:nowrap; text-align:center; }
+  .next-tag b{ color:var(--cream); font-weight:700; }
 
   /* onboarding hint — bigger, more transparent, shows briefly, includes swipe */
   #hint-layer{ position:absolute; inset:0; z-index:30; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: opacity .5s var(--ease); }
@@ -159,7 +171,7 @@
   .crt-layer{ position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .3s; z-index:5; }
   .crt-on .crt-layer{ opacity:1; }
   .crt-scanlines{ position:absolute; inset:0; background: repeating-linear-gradient(to bottom, rgba(0,0,0,.18) 0px, rgba(0,0,0,.18) 1px, transparent 2px, transparent 3px); mix-blend-mode: multiply; }
-  .crt-vignette{ position:absolute; inset:0; background: radial-gradient(120% 100% at 50% 50%, transparent 58%, rgba(0,0,0,.55) 100%); box-shadow: inset 0 0 90px 20px rgba(0,0,0,.5); }
+  .crt-vignette{ position:absolute; inset:0; background: radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(0,0,0,.6) 100%); box-shadow: inset 0 0 100px 24px rgba(0,0,0,.55); }
   .crt-rgb{ position:absolute; inset:0; mix-blend-mode:screen; opacity:.06; background: linear-gradient(90deg, #ff3b3b 0, transparent 2px, transparent 4px, #3bd6ff 4px, transparent 6px); background-size: 6px 100%; }
   .crt-flicker{ position:absolute; inset:0; background:#fff; opacity:0; animation: flick 5.5s infinite; }
   @keyframes flick{ 0%,96%,100%{opacity:0;} 97%{opacity:.03;} 98%{opacity:0;} 99%{opacity:.05;} }
@@ -184,8 +196,8 @@
   .btn.primary:hover{ background: var(--brick-bright); }
 
   /* controls bar — CH-, [Menu, Mute, CRT, Settings], CH+ */
-  .controls-bar{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 10px 4px 2px; flex:none; flex-wrap:wrap; }
-  .ch-btn{ display:flex; align-items:center; gap:7px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); color:var(--cream); padding:12px 20px; border-radius:12px; font-weight:700; font-size:13px; letter-spacing:.05em; cursor:pointer; transition: all .15s; }
+  .controls-bar{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 12px 4px 2px; flex:none; flex-wrap:wrap; }
+  .ch-btn{ display:flex; align-items:center; gap:8px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); color:var(--cream); padding:16px 26px; border-radius:14px; font-weight:700; font-size:16px; letter-spacing:.05em; cursor:pointer; transition: all .15s; }
   .ch-btn:hover{ background: rgba(255,255,255,.12); transform: translateY(-1px); }
   .mid-controls{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; }
   .icon-btn{ background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color: var(--cream-dim); width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; transition: all .15s; flex:none; }
@@ -253,11 +265,10 @@
 
   @media (max-width: 640px){
     .watermark{ font-size:15px; }
-    .bug-tl .nm{ display:none; }
-    .now-pill{ max-width:52%; }
-    .now-pill .meta .t1, .now-pill .meta .t2{ max-width:120px; }
-    .next-tag{ display:none; }
+    .now-pill{ max-width:94%; }
+    .now-pill .meta .t1, .now-pill .meta .t2{ max-width:220px; }
     .hint-box{ gap:18px; padding:18px 22px; }
+    .ch-btn{ padding:13px 18px; font-size:14px; }
   }
   @media (max-height: 620px){
     .controls-bar{ padding:8px 2px 0; }
@@ -273,7 +284,7 @@
   </div>
 
   <div id="splash" role="img" aria-label="Nostalgia TV powering on">
-    <img id="splash-img" src="NostalgiaTV.png" alt="Nostalgia TV splash screen" />
+    <img id="splash-img" src="NostalgiaTV.png" alt="Nostalgia TV logo" />
     <div class="splash-mark"><div class="tag">Nostalgia TV</div><h1>Turning on&nbsp;&hellip;</h1></div>
   </div>
   <div id="crt-boot"></div>
@@ -281,6 +292,8 @@
 
   <div id="app">
     <div class="tv-set crt-off" id="tv-set">
+      <span class="tv-led"></span>
+      <span class="tv-grille"></span>
       <div class="screen-shell" id="screen-shell">
         <div class="screen-inner" id="screen-inner">
           <canvas class="demo-canvas" id="demo-canvas"></canvas>
@@ -380,7 +393,6 @@
 (function(){
   "use strict";
 
-  /* CHANNELS now comes from channels.js (window.NOSTALGIA_CHANNELS) */
   var CHANNELS = window.NOSTALGIA_CHANNELS || [];
   var CATEGORIES = ["ALL","KIDS","ACTION","COMEDY"];
 
@@ -408,7 +420,7 @@
 
   var els = {};
   ["screen-shell","demo-canvas","player-layer","static-layer","static-canvas","static-num","static-name",
-   "state-unavailable","bug-tl","bug-logo","bug-num","bug-name","clock","info-layer",
+   "state-unavailable","clock","info-layer", "bug-tl","bug-logo","bug-num","bug-name",
    "pill-title","pill-sub","pill-thumb","info-next","chan-list","cat-tabs","search-input","guide-grid",
    "settings-list","tv-set","btn-crt","btn-mute","hint-layer"].forEach(function(id){
     els[id]=document.getElementById(id);
@@ -444,6 +456,7 @@
   function sndChannelChange(){ noiseBurst(0.22); beep(180,0.08,"square",0.03); }
   function sndClick(){ beep(700,0.04,"sine",0.03); }
   function sndStartup(){ beep(220,0.5,"sine",0.04); }
+  function sndType(){ beep(1500 + Math.random()*400, 0.02, "square", 0.018); }
 
   /* ---------- INTRO: typing text on black, then splash, then TV ---------- */
   function runIntro(){
@@ -454,26 +467,27 @@
 
     function finishIntro(){
       introEl.classList.add("fade-out");
-      setTimeout(function(){ introEl.style.display="none"; runSplash(); }, 450);
+      setTimeout(function(){ introEl.style.display="none"; runSplash(); }, 400);
     }
 
     if(reduced){
       textEl.innerHTML = msg + '<span class="caret"></span>';
-      setTimeout(finishIntro, 500);
+      setTimeout(finishIntro, 400);
       return;
     }
 
     var i = 0;
-    var typeSpeed = 80;
+    var typeSpeed = 45;
     function typeChar(){
       if(i <= msg.length){
         textEl.innerHTML = msg.slice(0,i) + '<span class="caret"></span>';
+        if(i>0 && msg.charAt(i-1)!==" ") sndType();
         i++;
         setTimeout(typeChar, typeSpeed);
       }
     }
     typeChar();
-    setTimeout(finishIntro, 3000);
+    setTimeout(finishIntro, 2200);
   }
 
   function runSplash(){
@@ -512,17 +526,15 @@
   function armAutoHide(){
     els["info-layer"].classList.remove("hidden");
     clearTimeout(hideTimer);
-    hideTimer = setTimeout(function(){ els["info-layer"].classList.add("hidden"); }, 5000);
+    hideTimer = setTimeout(function(){ els["info-layer"].classList.add("hidden"); }, 6000);
   }
   ["mousemove","touchstart","keydown","click"].forEach(function(evt){
     document.addEventListener(evt, function(){
       armAutoHide();
-      /* safety net: if the player is stuck (autoplay blocked pre-gesture),
-         any real user interaction is a valid gesture to retry playback */
       if(ytPlayer){
         try{
           var st = ytPlayer.getPlayerState();
-          if(st !== 1){ if(!state.muted) ytPlayer.unMute(); ytPlayer.playVideo(); }
+          if(st !== 1 && st !== 3){ if(!state.muted) ytPlayer.unMute(); ytPlayer.playVideo(); }
         }catch(e){}
       }
     }, {passive:true});
@@ -605,131 +617,72 @@
   var ytPlayer = null;
   function whenYTReady(cb){ if(ytReady) cb(); else ytQueue.push(cb); }
 
-  var EPISODE_MIN = 13; // rough average episode length in minutes — tune per feel
-  var EPISODE_GUESS_COUNT = 60;
-  function liveOffsetFor(channel){
+  /* Live-schedule simulation: pick a playlist index from the real time
+     of day, WITHOUT seeking mid-video (seeking is what caused the extra
+     buffering delay) — so it starts at a different point in the playlist
+     depending on when you tune in, but always starts a video cleanly
+     from its own beginning. */
+  var EPISODE_MIN = 13;
+  var EPISODE_GUESS_COUNT = 20; // keep at/under your shortest playlist's real length
+  function liveIndexFor(){
     var now = new Date();
-    var totalMinutes = now.getHours()*60 + now.getMinutes() + now.getSeconds()/60;
+    var totalMinutes = now.getHours()*60 + now.getMinutes();
     var slot = Math.floor(totalMinutes / EPISODE_MIN);
-    var index = slot % EPISODE_GUESS_COUNT;
-    var startSeconds = Math.floor((totalMinutes - slot*EPISODE_MIN) * 60);
-    return { index: index, startSeconds: startSeconds };
+    return slot % EPISODE_GUESS_COUNT;
   }
 
-  /* silently retries playback a few times — no visible UI, just resilience */
   function ensurePlaying(player, attempt){
     attempt = attempt || 0;
     try{
       var st = player.getPlayerState();
-      if(st !== 1){
+      if(st !== 1 && st !== 3){
         if(!state.muted) player.unMute();
         player.playVideo();
       }
     }catch(e){}
-    if(attempt < 6){ setTimeout(function(){ ensurePlaying(player, attempt+1); }, 500); }
+    if(attempt < 3){ setTimeout(function(){ ensurePlaying(player, attempt+1); }, 500); }
   }
 
-  function loadYouTubeChannel(channel) {
-  els["demo-canvas"].style.display = "none";
-  els["player-layer"].style.display = "block";
-
-  // Hide the player until YouTube actually starts playing.
-  els["player-layer"].style.opacity = "0";
-  els["player-layer"].innerHTML = '<div id="yt-mount"></div>';
-
-  whenYTReady(function () {
-    try {
-      var off = liveOffsetFor(channel);
-
-      ytPlayer = new YT.Player("yt-mount", {
-        playerVars: {
-          listType: "playlist",
-          list: channel.playlistId,
-          index: off.index || 0,
-
-          controls: 0,
-          disablekb: 1,
-          fs: 0,
-          rel: 0,
-          modestbranding: 1,
-          iv_load_policy: 3,
-          cc_load_policy: 0,
-          playsinline: 1,
-          mute: 1,
-          autoplay: 1
-        },
-
-        events: {
-          onReady: function (e) {
-            try {
-              e.target.unloadModule("captions");
-
-              if (!state.muted) {
-                e.target.unMute();
-              }
-
-              // Start playback from the required position.
-              if (off.startSeconds > 0) {
-                e.target.seekTo(off.startSeconds, true);
-              }
-
-              e.target.playVideo();
-            } catch (err) {
-              showState("state-unavailable");
-            }
+  function loadYouTubeChannel(channel){
+    els["demo-canvas"].style.display = "none";
+    els["player-layer"].style.display = "block";
+    els["player-layer"].style.opacity = "1";
+    els["player-layer"].innerHTML = '<div id="yt-mount"></div>';
+    whenYTReady(function(){
+      try{
+        var idx = liveIndexFor();
+        ytPlayer = new YT.Player('yt-mount', {
+          playerVars: {
+            listType:'playlist', list: channel.playlistId, index: idx,
+            autoplay:1, mute:1,
+            controls:0, disablekb:1, fs:0, rel:0, modestbranding:1,
+            iv_load_policy:3, cc_load_policy:0, playsinline:1
           },
-
-          onStateChange: function (e) {
-            try {
-              e.target.unloadModule("captions");
-            } catch (err) {}
-
-            // Only reveal the player when playback actually starts.
-            if (e.data === YT.PlayerState.PLAYING) {
-              els["player-layer"].style.opacity = "1";
-            }
-
-            // If buffering, keep the error screen hidden.
-            if (e.data === YT.PlayerState.BUFFERING) {
-              els["player-layer"].style.opacity = "1";
-            }
-          },
-
-          onError: function (e) {
-            console.log("YouTube error:", e.data);
-
-            // Don't immediately show the YouTube error screen.
-            // Give the playlist a moment to initialize.
-            setTimeout(function () {
-              try {
-                if (
-                  ytPlayer &&
-                  typeof ytPlayer.getPlayerState === "function"
-                ) {
-                  var playerState = ytPlayer.getPlayerState();
-
-                  if (
-                    playerState !== YT.PlayerState.PLAYING &&
-                    playerState !== YT.PlayerState.BUFFERING
-                  ) {
-                    showState("state-unavailable");
-                  }
-                }
-              } catch (err) {
-                showState("state-unavailable");
+          events:{
+            'onReady': function(e){
+              try{
+                e.target.unloadModule('captions');
+                if(!state.muted) e.target.unMute();
+                ensurePlaying(e.target);
+              }catch(err){}
+            },
+            'onStateChange': function(e){
+              try{ e.target.unloadModule('captions'); }catch(err){}
+            },
+            'onError': function(e){
+              /* error 2 = invalid index for this playlist's real length —
+                 retry once from the start instead of giving up */
+              if(e.data === 2){
+                try{ e.target.loadPlaylist({ list: channel.playlistId, listType:'playlist' }); return; }
+                catch(err){}
               }
-            }, 1500);
+              showState('state-unavailable');
+            }
           }
-        }
-      });
-
-    } catch (err) {
-      console.error(err);
-      showState("state-unavailable");
-    }
-  });
-}
-    
+        });
+      }catch(err){ showState('state-unavailable'); }
+    });
+  }
   function destroyYouTube(){ try{ if(ytPlayer && ytPlayer.destroy) ytPlayer.destroy(); }catch(e){} ytPlayer=null; els["player-layer"].innerHTML=""; }
 
   function hideAllStates(){ els["state-unavailable"].classList.remove("show"); }
@@ -795,8 +748,8 @@
     var sched = scheduleFor(ch, new Date());
     var next = sched.slots.filter(function(s){return s.offsetIndex===1;})[0];
     document.getElementById("info-next").textContent = next ? next.title : ch.name+" continues";
-    els["pill-title"].textContent = ch.name;
-    els["pill-sub"].textContent = "CH " + ch.number + " · " + ch.hindi;
+    els["pill-title"].textContent = ch.name + "  ·  CH " + ch.number;
+    els["pill-sub"].textContent = ch.hindi;
   }
 
   /* ---------- browser list ---------- */
@@ -856,7 +809,7 @@
 
   /* ---------- settings ---------- */
   var SETTINGS_META = [
-    {key:"sounds", label:"TV Sounds", desc:"Channel change, remote clicks & static"},
+    {key:"sounds", label:"TV Sounds", desc:"Channel change, typing & static"},
     {key:"animations", label:"Animations", desc:"Static transitions & motion"}
   ];
   function renderSettings(){
