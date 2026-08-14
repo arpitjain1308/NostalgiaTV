@@ -23,7 +23,8 @@
   *{box-sizing:border-box;}
   html,body{ margin:0; padding:0; height:100%; overscroll-behavior:none; }
   body{
-    background:#050403; color: var(--cream);
+    background: #05040300;
+    color: var(--cream);
     font-family:'IBM Plex Sans', system-ui, sans-serif;
     height:100%; overflow:hidden; -webkit-font-smoothing:antialiased;
   }
@@ -32,44 +33,39 @@
   ::selection{ background: var(--brick); color:var(--cream); }
   :focus-visible{ outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
 
-  /* ---------- INTRO: black typing screen ---------- */
-  #intro-black{
-    position:fixed; inset:0; z-index:10000; background:#000;
-    display:flex; align-items:center; justify-content:center;
-    transition: opacity .45s linear;
-  }
-  #intro-black.fade-out{ opacity:0; pointer-events:none; }
-  #intro-text{
-    color:#fff; font-family:'IBM Plex Mono', monospace;
-    font-size: clamp(16px,3.6vw,32px); letter-spacing:.02em; text-align:center; padding:0 20px;
-  }
-  .caret{ display:inline-block; width:2px; height:1em; background:#fff; margin-left:3px; vertical-align:-2px; animation: caretBlink 0.9s steps(1) infinite; }
-  @keyframes caretBlink{ 50%{ opacity:0; } }
-
-  /* ---------- SPLASH (no zoom — flash-in only) ---------- */
+  /* ---------- SPLASH ---------- */
   #splash{ position:fixed; inset:0; z-index:9999; background:#000; display:flex; align-items:center; justify-content:center; }
-  #splash img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; }
-  #splash.run img{ animation: splashIn 2s var(--ease) forwards; }
+  #splash img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter: saturate(1.05) contrast(1.05); animation: splashIn 2s var(--ease) forwards; }
   #splash::after{ content:""; position:absolute; inset:0; background: radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(0,0,0,.55) 100%); pointer-events:none; }
-  #splash .splash-mark{ position:relative; z-index:2; text-align:center; opacity:0; }
-  #splash.run .splash-mark{ animation: markIn 2s var(--ease) forwards; }
+  #splash .splash-mark{ position:relative; z-index:2; text-align:center; opacity:0; animation: markIn 2s var(--ease) forwards; }
   #splash .splash-mark .tag{ font-family:'IBM Plex Mono', monospace; letter-spacing:.35em; font-size:11px; color: var(--gold); text-transform:uppercase; margin-bottom:10px; }
   #splash .splash-mark h1{ font-size: clamp(28px, 6vw, 58px); font-style:italic; font-weight:600; margin:0; color:#fff; text-shadow: 0 4px 30px rgba(0,0,0,.6); }
   @keyframes splashIn{
-    0%{ opacity:0; filter: brightness(0) saturate(1.05) contrast(1.05); }
+    0%{ opacity:0; transform:scale(1.06); filter: brightness(0) saturate(1.05) contrast(1.05); }
     8%{ filter: brightness(2.2) saturate(1.05) contrast(1.05); }
-    22%{ opacity:1; filter: brightness(1) saturate(1.05) contrast(1.05); }
-    100%{ opacity:1; }
+    22%{ opacity:1; filter: brightness(1) saturate(1.05) contrast(1.05); transform:scale(1.02); }
+    100%{ opacity:1; transform:scale(1); }
   }
   @keyframes markIn{ 0%,15%{opacity:0; transform:translateY(8px);} 35%{opacity:1; transform:translateY(0);} 88%{opacity:1;} 100%{opacity:0;} }
   #splash.fade-out{ opacity:0; transition: opacity .35s linear; pointer-events:none; }
-  @media (prefers-reduced-motion: reduce){ #splash img{ animation-duration:.3s !important;} #splash .splash-mark{ animation-duration:.3s !important;} }
+  @media (prefers-reduced-motion: reduce){ #splash img{ animation-duration:.3s;} #splash .splash-mark{ animation-duration:.3s;} }
 
-  /* CRT power-on flash bridging splash -> TV */
-  #crt-boot{ position:fixed; inset:0; z-index:9998; background:#fff; opacity:0; pointer-events:none; }
+  /* CRT power-on flash that bridges splash -> app */
+  #crt-boot{
+    position:fixed; inset:0; z-index:9998; background:#fff; opacity:0; pointer-events:none;
+  }
   #crt-boot.flash{ animation: crtFlash .55s ease-out forwards; }
-  @keyframes crtFlash{ 0%{opacity:0;} 8%{opacity:1;} 28%{opacity:.85;} 45%{opacity:0;} 100%{opacity:0;} }
-  .crt-line{ position:fixed; left:0; right:0; top:50%; height:2px; background:#fff; z-index:9998; transform: translateY(-50%) scaleY(0); opacity:0; pointer-events:none; box-shadow:0 0 40px 8px rgba(255,255,255,.9); }
+  @keyframes crtFlash{
+    0%{ opacity:0; }
+    8%{ opacity:1; }
+    28%{ opacity:.85; }
+    45%{ opacity:0; }
+    100%{ opacity:0; }
+  }
+  .crt-line{
+    position:fixed; left:0; right:0; top:50%; height:2px; background:#fff; z-index:9998;
+    transform: translateY(-50%) scaleY(0); opacity:0; pointer-events:none; box-shadow:0 0 40px 8px rgba(255,255,255,.9);
+  }
   .crt-line.boot{ animation: crtLine .6s var(--ease) forwards; }
   @keyframes crtLine{
     0%{ transform: translateY(-50%) scaleY(0); opacity:0; }
@@ -80,82 +76,85 @@
     100%{ transform: translateY(-50%) scaleY(1); opacity:0; }
   }
 
-  /* ---------- APP SHELL (fixed viewport, no scroll, near full width) ---------- */
-  #app{ opacity:0; height:100%; max-width:1620px; margin:0 auto; padding: 8px; display:flex; flex-direction:column; min-height:0; }
+  /* ---------- APP SHELL (fixed viewport, no page scroll, near full width) ---------- */
+  #app{
+    opacity:0; height:100%; max-width:1620px; margin:0 auto;
+    padding: 0px; display:flex; flex-direction:column; min-height:0;
+  }
   #app.visible{ opacity:1; transition: opacity .25s linear; }
 
-  /* CRT television casing */
   .tv-set{
-    background: linear-gradient(160deg, #2a1f19, #0c0a08 65%);
-    border-radius: 26px; padding: 12px;
-    box-shadow: var(--shadow-deep), inset 0 2px 0 rgba(255,255,255,.06), inset 0 -2px 0 rgba(0,0,0,.4);
-    border: 1px solid rgba(255,255,255,.07);
+    background: linear-gradient(160deg, var(--bezel-2), var(--bezel-0) 70%);
+    border-radius: 0px; padding: 0px;
+    box-shadow: var(--shadow-deep), inset 0 1px 0 rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.06);
     position:relative; flex:1; min-height:0; display:flex; flex-direction:column;
+    transform-origin:center;
   }
-  .tv-set::before{ content:""; position:absolute; inset:0; border-radius:26px; pointer-events:none; background: repeating-linear-gradient(115deg, rgba(255,255,255,.018) 0 2px, transparent 2px 6px); mix-blend-mode: overlay; }
   .tv-set.boot{ animation: tvBoot .5s var(--ease) .05s both; }
-  @keyframes tvBoot{ 0%{ filter:brightness(4) contrast(1.3); } 55%{ filter:brightness(1.4); } 100%{ filter:brightness(1); } }
-
-  /* screen -- fills remaining space, recessed like a CRT tube */
-  .screen-shell{
-    position:relative; border-radius: 18px; overflow:hidden; background:#000; width:100%; flex:1; min-height:0;
-    box-shadow: inset 0 0 0 3px rgba(0,0,0,.55), inset 0 0 0 4px rgba(255,255,255,.04), inset 0 0 70px rgba(0,0,0,.7);
+  @keyframes tvBoot{
+    0%{ filter:brightness(4) contrast(1.3); }
+    55%{ filter:brightness(1.4); }
+    100%{ filter:brightness(1); }
   }
+
+  /* header row: minimal, only nav (logo now lives as watermark on screen) */
+  .tv-header{ display:flex; align-items:center; justify-content:flex-end; padding: 2px 6px 6px; flex:none; gap:8px; }
+  .tv-nav{ display:flex; align-items:center; gap:2px; }
+  .tv-nav button{ background:transparent; border:none; color: var(--cream-dim); font-size:11.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; padding:7px 9px; border-radius:8px; cursor:pointer; transition: color .2s, background .2s; }
+  .tv-nav button:hover{ color:var(--cream); background: rgba(255,255,255,.06); }
+
+  /* screen -- fills all remaining space */
+  .screen-shell{ position:relative; border-radius: 10px; overflow:hidden; background:#000; width:100%; flex:1; min-height:0; box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), inset 0 0 60px rgba(0,0,0,.6); }
   .screen-inner{ position:absolute; inset:0; }
   .demo-canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
   .player-layer{ position:absolute; inset:0; width:100%; height:100%; }
   .player-layer iframe{ width:100%; height:100%; border:0; display:block; pointer-events:none; }
-  /* permanent subtle glass reflection, independent of CRT toggle */
-  .screen-shell::after{
-    content:""; position:absolute; inset:0; pointer-events:none; z-index:6;
-    background: radial-gradient(140% 90% at 20% -10%, rgba(255,255,255,.06), transparent 45%);
-  }
 
-  /* persistent watermark logo — bottom-left, always visible */
+  /* persistent watermark logo — always visible, never auto-hides */
   .watermark{
-    position:absolute; bottom:14px; left:16px; z-index:9; display:flex; align-items:baseline; gap:7px;
-    font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:19px;
-    color:rgba(244,232,212,.6); text-shadow:0 2px 10px rgba(0,0,0,.7); pointer-events:none;
+    position:absolute; top:16px; left:16px; z-index:9; display:flex; align-items:baseline; gap:8px;
+    font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:24px;
+    color:rgba(244,232,212,.6); text-shadow:0 2px 10px rgba(0,0,0,.6); pointer-events:none;
   }
-  .watermark b{ color: rgba(199,74,46,.82); font-style:normal; }
+  .watermark b{ color: rgba(199,74,46,.8); font-style:normal; }
 
   /* auto-hiding info layer */
   .info-layer{ position:absolute; inset:0; z-index:8; opacity:1; transition: opacity .5s var(--ease); pointer-events:none; }
   .info-layer.hidden{ opacity:0; }
   .info-layer *{ pointer-events:none; }
 
-  /* channel badge — now top-left, where the logo used to be */
-  .bug-tl{ position:absolute; top:16px; left:16px; display:flex; align-items:center; gap:10px; background: rgba(10,7,5,.48); backdrop-filter: blur(3px); padding:8px 15px 8px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.1); }
-  .bug-tl .logo{ width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; flex:none; }
-  .bug-tl .txt{ line-height:1.1; }
-  .bug-tl .num{ font-family:'IBM Plex Mono',monospace; font-size:16px; color:var(--gold); font-weight:600; }
-  .bug-tl .nm{ font-size:16px; font-weight:700; }
+  .bug-tl{ position:absolute; top:16px; left:130px; display:flex; align-items:center; gap:10px; background: rgba(10,7,5,.45); backdrop-filter: blur(3px); padding:8px 14px 8px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.1); }
+  .bug-tl .logo{ width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#fff; flex:none; }
+  .bug-tl .txt{ line-height:1.05; }
+  .bug-tl .num{ font-family:'IBM Plex Mono',monospace; font-size:14px; color:var(--gold); font-weight:600; }
+  .bug-tl .nm{ font-size:15px; font-weight:700; }
 
   .bug-tr{ position:absolute; top:16px; right:16px; display:flex; align-items:center; gap:10px; }
-  .bug-tr .clk{ font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--cream-dim); background: rgba(10,7,5,.45); backdrop-filter: blur(3px); padding:8px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.1); }
-  .live-pill{ display:flex; align-items:center; gap:7px; background: rgba(192,57,43,.22); border:1px solid rgba(192,57,43,.5); color:#f0897c; font-size:11.5px; font-weight:700; padding:8px 14px 8px 10px; border-radius:999px; letter-spacing:.08em; backdrop-filter: blur(3px); }
+  .bug-tr .clk{ font-family:'IBM Plex Mono',monospace; font-size:14px; color:var(--cream-dim); background: rgba(10,7,5,.45); backdrop-filter: blur(3px); padding:8px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.1); }
+  .live-pill{ display:flex; align-items:center; gap:7px; background: rgba(192,57,43,.22); border:1px solid rgba(192,57,43,.5); color:#f0897c; font-size:12.5px; font-weight:700; padding:8px 14px 8px 10px; border-radius:999px; letter-spacing:.08em; backdrop-filter: blur(3px); }
   .live-dot{ width:7px; height:7px; border-radius:50%; background:#e0402c; box-shadow:0 0 8px #e0402c; animation:pulse 1.6s infinite; }
   @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
 
-  .bug-bottom{ position:absolute; left:0; right:0; bottom:0; padding: 30px 16px 14px; display:flex; align-items:center; justify-content:flex-end; gap:14px; background: linear-gradient(180deg, transparent, rgba(6,4,3,.8) 60%, rgba(6,4,3,.9)); flex-wrap:wrap; }
-  .now-pill{ display:flex; align-items:center; gap:11px; min-width:0; background: linear-gradient(100deg, rgba(165,49,31,.88), rgba(60,20,14,.7)); border:1px solid rgba(255,255,255,.14); border-radius: 999px; padding:7px 16px 7px 7px; box-shadow: 0 10px 26px rgba(0,0,0,.35); max-width:60%; }
-  .now-pill .thumb{ width:34px; height:34px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:15px; }
+  .bug-bottom{ position:absolute; left:0; right:0; bottom:0; padding: 32px 18px 16px; display:flex; align-items:center; justify-content:space-between; gap:16px; background: linear-gradient(180deg, transparent, rgba(6,4,3,.82) 60%, rgba(6,4,3,.92)); flex-wrap:wrap; }
+  .now-pill{ display:flex; align-items:center; gap:12px; min-width:0; background: linear-gradient(100deg, rgba(165,49,31,.88), rgba(60,20,14,.7)); border:1px solid rgba(255,255,255,.14); border-radius: 999px; padding:8px 18px 8px 8px; box-shadow: 0 10px 26px rgba(0,0,0,.35); max-width:60%; }
+  .now-pill .thumb{ width:40px; height:40px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:17px; }
   .now-pill .meta{ min-width:0; }
-  .now-pill .meta .t1{ font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:250px; }
-  .now-pill .meta .t2{ font-size:10.5px; color:var(--cream-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:250px; }
-  .next-tag{ font-size:12px; color: var(--cream-dim); white-space:nowrap; }
+  .now-pill .meta .t1{ font-size:15px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px; }
+  .now-pill .meta .t2{ font-size:12px; color:var(--cream-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px; }
+  .next-tag{ font-size:14px; color: var(--cream-dim); white-space:nowrap; }
   .next-tag b{ color:var(--cream); font-weight:600; }
+  .locked-tag{ font-family:'IBM Plex Mono',monospace; font-size:11px; color: rgba(244,232,212,.45); letter-spacing:.08em; }
 
-  /* onboarding hint — bigger, more transparent, shows briefly, includes swipe */
-  #hint-layer{ position:absolute; inset:0; z-index:30; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: opacity .5s var(--ease); }
-  #hint-layer.show{ opacity:.82; }
-  .hint-box{ display:flex; align-items:center; gap:32px; background:rgba(8,6,5,.24); backdrop-filter: blur(2px); padding:22px 36px; border-radius:20px; border:1px solid rgba(255,255,255,.1); flex-wrap:wrap; justify-content:center; }
-  .hint-item{ display:flex; flex-direction:column; align-items:center; gap:8px; }
-  .hint-key{ font-family:'IBM Plex Mono',monospace; font-size:17px; font-weight:600; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); padding:9px 16px; border-radius:10px; }
-  .hint-swipe{ font-size:20px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); padding:9px 16px; border-radius:10px; }
-  .hint-label{ font-size:12px; color:var(--cream-dim); letter-spacing:.03em; text-align:center; }
+  /* onboarding hint — shows once, transparent, auto-dismiss */
+  #hint-layer{ position:absolute; inset:0; z-index:30; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: opacity .6s var(--ease); }
+  #hint-layer.show{ opacity:1; }
+  .hint-box{ display:flex; align-items:center; gap:22px; background:rgba(8,6,5,.42); backdrop-filter: blur(2px); padding:16px 26px; border-radius:16px; border:1px solid rgba(255,255,255,.12); }
+  .hint-item{ display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .hint-key{ font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); padding:6px 12px; border-radius:8px; }
+  .hint-label{ font-size:10.5px; color:var(--cream-dim); letter-spacing:.04em; text-align:center; }
 
-  /* CRT overlay (scanlines etc — toggle) */
+  /* CRT overlay */
   .crt-layer{ position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .3s; z-index:5; }
   .crt-on .crt-layer{ opacity:1; }
   .crt-scanlines{ position:absolute; inset:0; background: repeating-linear-gradient(to bottom, rgba(0,0,0,.18) 0px, rgba(0,0,0,.18) 1px, transparent 2px, transparent 3px); mix-blend-mode: multiply; }
@@ -171,31 +170,34 @@
   .chan-card{ position:relative; z-index:2; text-align:center; }
   .chan-card .num{ font-family:'IBM Plex Mono',monospace; font-size: clamp(28px,7vw,50px); font-weight:600; color:#fff; letter-spacing:.02em; text-shadow: 0 0 24px rgba(0,0,0,.8);}
   .chan-card .nm{ font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size: clamp(15px,3vw,22px); color: var(--gold); margin-top:2px; }
+  .chan-card .hi{ font-size: clamp(13px,2.4vw,18px); color:var(--cream-dim); margin-top:2px; font-family:'Noto Sans Devanagari',sans-serif; }
 
+  /* states: unavailable / tap for sound */
   .state-layer{ position:absolute; inset:0; z-index:15; display:none; align-items:center; justify-content:center; flex-direction:column; gap:8px; text-align:center; padding:16px; background: linear-gradient(180deg, rgba(10,7,6,.92), rgba(10,7,6,.98)); }
   .state-layer.show{ display:flex; }
   .state-layer .icon{ font-size:32px; opacity:.85; }
   .state-layer h3{ margin:2px 0 2px; font-size:16px; font-style:italic; font-weight:600; }
   .state-layer p{ margin:0; color:var(--cream-dim); font-size:12px; max-width:300px; }
   .state-layer .row{ display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; justify-content:center; }
+  .sound-chip{ position:absolute; z-index:16; bottom:14px; left:14px; display:none; align-items:center; gap:8px; background:rgba(10,7,5,.7); border:1px solid rgba(255,255,255,.16); padding:8px 12px; border-radius:999px; font-size:11.5px; cursor:pointer; }
+  .sound-chip.show{ display:flex; }
   .btn{ border:1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06); color:var(--cream); padding:8px 14px; border-radius:9px; font-size:11.5px; font-weight:600; letter-spacing:.04em; cursor:pointer; transition: all .18s; }
   .btn:hover{ background: rgba(255,255,255,.14); }
   .btn.primary{ background: var(--brick); border-color: var(--brick-bright); }
   .btn.primary:hover{ background: var(--brick-bright); }
 
-  /* controls bar — CH-, [Menu, Mute, CRT, Settings], CH+ */
-  .controls-bar{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 10px 4px 2px; flex:none; flex-wrap:wrap; }
-  .ch-btn{ display:flex; align-items:center; gap:7px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); color:var(--cream); padding:12px 20px; border-radius:12px; font-weight:700; font-size:13px; letter-spacing:.05em; cursor:pointer; transition: all .15s; }
+  /* controls bar */
+  .controls-bar{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding: 8px 4px 2px; flex:none; flex-wrap:wrap; }
+  .ch-btn{ display:flex; align-items:center; gap:6px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); color:var(--cream); padding:9px 14px; border-radius:11px; font-weight:700; font-size:11.5px; letter-spacing:.05em; cursor:pointer; transition: all .15s; }
   .ch-btn:hover{ background: rgba(255,255,255,.12); transform: translateY(-1px); }
-  .mid-controls{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; }
-  .icon-btn{ background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color: var(--cream-dim); width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; transition: all .15s; flex:none; }
+  .mid-controls{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:center; }
+  .icon-btn{ background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color: var(--cream-dim); width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer; transition: all .15s; flex:none; }
   .icon-btn:hover{ color:var(--cream); background: rgba(255,255,255,.12); }
   .icon-btn.on{ color: var(--gold); border-color: rgba(219,165,63,.5); background: rgba(219,165,63,.1); }
-  .label-btn{ background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:var(--cream-dim); padding:10px 15px; border-radius:11px; font-size:12.5px; font-weight:700; letter-spacing:.04em; cursor:pointer; display:flex; align-items:center; gap:7px; }
+  .label-btn{ background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:var(--cream-dim); padding:8px 12px; border-radius:10px; font-size:11px; font-weight:600; letter-spacing:.04em; cursor:pointer; display:flex; align-items:center; gap:6px; }
   .label-btn:hover{ color:var(--cream); background: rgba(255,255,255,.12); }
-  .label-btn.on{ color: var(--gold); border-color: rgba(219,165,63,.5); background: rgba(219,165,63,.1); }
 
-  /* overlays */
+  /* overlays (guide / browser / settings / remote) */
   .overlay-backdrop{ position:fixed; inset:0; background: rgba(6,4,3,.72); backdrop-filter: blur(3px); z-index:200; display:none; align-items:flex-end; justify-content:center; animation: fadeBg .2s; }
   .overlay-backdrop.show{ display:flex; }
   @keyframes fadeBg{ from{opacity:0;} to{opacity:1;} }
@@ -223,6 +225,8 @@
   .chan-row .meta{ flex:1; min-width:0; }
   .chan-row .meta .n{ font-weight:600; font-size:13.5px; }
   .chan-row .meta .p{ font-size:11px; color:var(--cream-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .chan-row .fav{ background:none; border:none; color:var(--cream-dim); font-size:16px; cursor:pointer; flex:none; padding:6px; }
+  .chan-row .fav.on{ color:#e0402c; }
   .guide-grid{ display:flex; flex-direction:column; gap:14px; }
   .guide-row{ display:flex; gap:12px; align-items:flex-start; }
   .guide-row .gch{ width:96px; flex:none; padding-top:8px; }
@@ -244,36 +248,42 @@
   .switch .track::before{ content:""; position:absolute; width:18px; height:18px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
   .switch input:checked + .track{ background: var(--brick); }
   .switch input:checked + .track::before{ transform:translateX(18px); }
-
-  /* menu popover — Channels / TV Guide */
-  .menu-option{ display:flex; align-items:center; gap:12px; width:100%; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); color:var(--cream); padding:16px 18px; border-radius:14px; font-size:14.5px; font-weight:600; cursor:pointer; margin-bottom:10px; text-align:left; }
-  .menu-option:hover{ background: rgba(255,255,255,.09); }
-  .menu-option:last-child{ margin-bottom:0; }
-  .menu-option .ic{ font-size:20px; }
+  #remote-drawer .panel{ max-width:340px; }
+  .remote-body{ background: linear-gradient(180deg, #221a16, #150f0c); border-radius:22px; padding:18px 16px 22px; border:1px solid rgba(255,255,255,.08); }
+  .remote-body .rlabel{ text-align:center; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.3em; color:var(--cream-dim); margin-bottom:14px; }
+  .keypad{ display:grid; grid-template-columns: repeat(3,1fr); gap:8px; margin-bottom:12px; }
+  .rkey{ background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09); color:var(--cream); padding:12px 0; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; font-family:'IBM Plex Mono',monospace; }
+  .rkey:hover{ background: rgba(255,255,255,.12); }
+  .remote-row{ display:grid; grid-template-columns: repeat(3,1fr); gap:8px; margin-bottom:8px; }
+  .remote-row .rbtn{ background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09); color:var(--cream-dim); padding:10px 0; border-radius:10px; font-size:11px; font-weight:700; letter-spacing:.04em; cursor:pointer; }
+  .remote-row .rbtn:hover{ color:#fff; background: rgba(255,255,255,.12); }
+  .remote-row .rbtn.ok{ background: var(--brick); color:#fff; border-color: var(--brick-bright); }
+  .remote-nav{ display:flex; align-items:center; justify-content:center; gap:10px; margin: 8px 0 4px; }
+  .remote-nav .rbtn{ width:56px; }
+  .remote-buffer{ text-align:center; font-family:'IBM Plex Mono',monospace; font-size:22px; color:var(--gold); min-height:28px; margin-bottom:8px; letter-spacing:.1em; }
 
   @media (max-width: 640px){
-    .watermark{ font-size:15px; }
+    .tv-nav{ display:none; }
+    .bug-tl{ left:14px; }
     .bug-tl .nm{ display:none; }
+    .watermark{ font-size:13px; }
     .now-pill{ max-width:52%; }
     .now-pill .meta .t1, .now-pill .meta .t2{ max-width:120px; }
     .next-tag{ display:none; }
-    .hint-box{ gap:18px; padding:18px 22px; }
+    .locked-tag{ display:none; }
+    .hint-box{ gap:12px; padding:12px 16px; }
   }
   @media (max-height: 620px){
-    .controls-bar{ padding:8px 2px 0; }
-    .icon-btn{ width:36px; height:36px; }
+    .controls-bar{ padding:6px 2px 0; }
+    .icon-btn{ width:30px; height:30px; }
   }
   .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
 </style>
 </head>
 <body>
 
-  <div id="intro-black">
-    <div id="intro-text"><span class="caret"></span></div>
-  </div>
-
   <div id="splash" role="img" aria-label="Nostalgia TV powering on">
-    <img id="splash-img" src="NostalgiaTV.png" alt="Nostalgia TV splash screen" />
+    <img id="splash-img" src="NostalgiaTV.png" alt="Nostalgia TV logo" />
     <div class="splash-mark"><div class="tag">Nostalgia TV</div><h1>Turning on&nbsp;&hellip;</h1></div>
   </div>
   <div id="crt-boot"></div>
@@ -281,16 +291,25 @@
 
   <div id="app">
     <div class="tv-set crt-off" id="tv-set">
+      <div class="tv-header">
+        <nav class="tv-nav" aria-label="Primary">
+          <button data-open="browser">Channels</button>
+          <button data-open="guide">Guide</button>
+          <button data-open="browser" data-fav="1">Favorites</button>
+          <button data-open="settings">Settings</button>
+        </nav>
+      </div>
+
       <div class="screen-shell" id="screen-shell">
         <div class="screen-inner" id="screen-inner">
           <canvas class="demo-canvas" id="demo-canvas"></canvas>
           <div class="player-layer" id="player-layer"></div>
 
+          <div class="watermark"><span>Nostalgia</span><b>TV</b></div>
+
           <div class="crt-layer">
             <div class="crt-rgb"></div><div class="crt-scanlines"></div><div class="crt-vignette"></div><div class="crt-flicker"></div>
           </div>
-
-          <div class="watermark"><span>Nostalgia</span><b>TV</b></div>
 
           <div class="info-layer" id="info-layer">
             <div class="bug-tl" id="bug-tl">
@@ -307,6 +326,7 @@
                 <div class="meta"><div class="t1" id="pill-title">Now Playing</div><div class="t2" id="pill-sub">&mdash;</div></div>
               </div>
               <div class="next-tag">NEXT: <b id="info-next">&mdash;</b></div>
+              <div class="locked-tag">🔒 LIVE BROADCAST · NO SEEKING</div>
             </div>
           </div>
 
@@ -314,7 +334,6 @@
             <div class="hint-box">
               <div class="hint-item"><span class="hint-key">←</span><span class="hint-label">Prev<br/>channel</span></div>
               <div class="hint-item"><span class="hint-key">→</span><span class="hint-label">Next<br/>channel</span></div>
-              <div class="hint-item"><span class="hint-swipe">👆↔</span><span class="hint-label">Swipe on<br/>phone</span></div>
               <div class="hint-item"><span class="hint-key">F</span><span class="hint-label">Fullscreen</span></div>
             </div>
           </div>
@@ -328,27 +347,23 @@
             <div class="icon">📺</div><h3>Channel unavailable</h3><p>This channel isn't broadcasting right now.</p>
             <div class="row"><button class="btn primary" id="btn-retry">Try again</button><button class="btn" id="btn-goguide">Channel guide</button></div>
           </div>
+
+          <button class="sound-chip" id="sound-chip">🔊 Tap for sound</button>
         </div>
       </div>
 
       <div class="controls-bar">
         <button class="ch-btn" id="btn-chdown" aria-label="Previous channel">◀ CH−</button>
         <div class="mid-controls">
-          <button class="label-btn" id="btn-menu" title="Menu" aria-label="Menu">☰ Menu</button>
+          <button class="label-btn" id="btn-channels">☰ Channels</button>
           <button class="icon-btn" id="btn-mute" title="Mute / unmute" aria-label="Mute">🔊</button>
-          <button class="label-btn" id="btn-crt" title="Toggle CRT mode" aria-label="CRT mode">▦ CRT</button>
-          <button class="icon-btn" id="btn-settings" title="Settings" aria-label="Settings">⚙</button>
+          <button class="icon-btn" id="btn-fav" title="Favorite this channel" aria-label="Favorite">♡</button>
+          <button class="icon-btn" id="btn-crt" title="Toggle CRT mode" aria-label="CRT mode">▦</button>
+          <button class="icon-btn" id="btn-remote" title="Show remote" aria-label="Remote">📱</button>
+          <button class="icon-btn" id="btn-fullscreen" title="Fullscreen" aria-label="Fullscreen">⤢</button>
         </div>
         <button class="ch-btn" id="btn-chup" aria-label="Next channel">CH+ ▶</button>
       </div>
-    </div>
-  </div>
-
-  <div class="overlay-backdrop" id="ov-menu">
-    <div class="panel" role="dialog" aria-label="Menu" style="max-width:380px;">
-      <div class="panel-head"><h2>Menu</h2><button class="panel-close" data-close>✕</button></div>
-      <button class="menu-option" id="menu-channels"><span class="ic">📺</span> Channels</button>
-      <button class="menu-option" id="menu-guide"><span class="ic">🗓️</span> TV Guide</button>
     </div>
   </div>
 
@@ -375,14 +390,48 @@
     </div>
   </div>
 
-<script src="channels.js"></script>
+  <div class="overlay-backdrop" id="remote-drawer">
+    <div class="panel">
+      <div class="panel-head"><h2>Remote</h2><button class="panel-close" data-close>✕</button></div>
+      <div class="remote-body">
+        <div class="rlabel">NOSTALGIA</div>
+        <div class="remote-buffer" id="remote-buffer">&nbsp;</div>
+        <div class="keypad" id="keypad"></div>
+        <div class="remote-row"><button class="rbtn" data-r="volm">VOL−</button><button class="rbtn" data-r="mute">MUTE</button><button class="rbtn" data-r="volp">VOL+</button></div>
+        <div class="remote-nav"><button class="rbtn" data-r="chdown">CH−</button><button class="rbtn ok" data-r="ok">OK</button><button class="rbtn" data-r="chup">CH+</button></div>
+        <div class="remote-row" style="grid-template-columns:1fr;"><button class="rbtn" data-r="menu">MENU</button></div>
+      </div>
+    </div>
+  </div>
+
 <script>
 (function(){
   "use strict";
 
-  /* CHANNELS now comes from channels.js (window.NOSTALGIA_CHANNELS) */
-  var CHANNELS = window.NOSTALGIA_CHANNELS || [];
+  /* =========================================================
+     DATA MODEL — each channel is dedicated to one real show.
+     Playlists are official YouTube playlists supplied by the
+     user; embedded via the official IFrame API only (no
+     downloading / proxying / re-hosting of any video).
+  ========================================================= */
+  var CHANNELS = [
+    { id:"doraemon", number:101, name:"Doraemon", hindi:"डोरेमोन", category:"Kids", colorTheme:"#2e6db4", provider:"youtube", playlistId:"PLdylmcropajnrCwuOavRIui3oJcCiMe97" },
+    { id:"ben10", number:102, name:"Ben 10", hindi:"बेन दस", category:"Action", colorTheme:"#3f8f6a", provider:"youtube", playlistId:"PLckQZM6PG6qmYXuQ-yyorL5oZELWa2m_U" },
+    { id:"bheem", number:103, name:"Chhota Bheem", hindi:"छोटा भीम", category:"Kids", colorTheme:"#dba53f", provider:"youtube", playlistId:"PL_J7KQaTDoWzFZOCZL8Q4_HXe5mUDaMC7" },
+    { id:"shinchan", number:104, name:"Shin Chan", hindi:"शिन चैन", category:"Comedy", colorTheme:"#c74a2e", provider:"youtube", playlistId:"PLTTCQD5UneeXWwerGsY43JrIezwWW0Tc4" },
+    { id:"kristribalti", number:105, name:"Krish Trish and Baltiboy", hindi:"कृष त्रिष और बाल्टीबॉय", category:"Kids", colorTheme:"#7a4fa0", provider:"youtube", playlistId:"PLnizMbB3qjBjCfkHNqQugR5TwX9AHK_tQ" },
+    { id:"oggy", number:106, name:"Oggy and the Cockroaches", hindi:"ऑगी और तिलचट्टे", category:"Comedy", colorTheme:"#4c7a4f", provider:"youtube", playlistId:"PLWRtCKKTD7jhruYeDoKRBs7Ze8kvDbDCg" },
+    { id:"courage", number:107, name:"Courage the Cowardly Dog", hindi:"डरपोक कुत्ता", category:"Comedy", colorTheme:"#6f4f8f", provider:"youtube", playlistId:"PLckQZM6PG6ql0dIrycjU6lw2nEFGILJoi" },
+    { id:"mrbean", number:108, name:"Mr. Bean", hindi:"मिस्टर बीन", category:"Comedy", colorTheme:"#a5311f", provider:"youtube", playlistId:"PLSU-__dAGVFbS50AjfClDtiByhgQanWh4" },
+    { id:"henry", number:109, name:"Bas Karo Henry", hindi:"बस करो हेनरी", category:"Comedy", colorTheme:"#6f93a8", provider:"youtube", playlistId:"PLJb4OQxDh-QU9GEnYD7SrwASiGFlbMwaG" },
+    { id:"tomjerry", number:110, name:"Tom and Jerry", hindi:"टॉम एंड जेरी", category:"Comedy", colorTheme:"#c9a13a", provider:"youtube", playlistId:"PLnurtxqhggI8K3MRsOVOD6kF682zwUMp6" }
+  ];
   var CATEGORIES = ["ALL","KIDS","ACTION","COMEDY"];
+
+  /* NOTE: the playlist for Courage the Cowardly Dog was received without
+     its leading "PL" — added back here on the assumption of a copy/paste
+     drop. If playback for that channel looks wrong, resend the ID and
+     it's a one-line fix. */
 
   var SLOT_MIN = 12;
   function scheduleFor(channel, dateNow){
@@ -401,16 +450,18 @@
 
   var state = {
     currentIndex: 0,
-    settings: { crt:true, sounds:true, animations:true },
+    favorites: {},
+    settings: { crt:true, sounds:true, animations:true, showRemote:true },
     muted:false,
-    lastCategory:"ALL"
+    lastCategory:"ALL",
+    remoteBuffer:""
   };
 
   var els = {};
   ["screen-shell","demo-canvas","player-layer","static-layer","static-canvas","static-num","static-name",
    "state-unavailable","bug-tl","bug-logo","bug-num","bug-name","clock","info-layer",
    "pill-title","pill-sub","pill-thumb","info-next","chan-list","cat-tabs","search-input","guide-grid",
-   "settings-list","tv-set","btn-crt","btn-mute","hint-layer"].forEach(function(id){
+   "settings-list","keypad","remote-buffer","tv-set","btn-fav","btn-crt","btn-mute","sound-chip","hint-layer"].forEach(function(id){
     els[id]=document.getElementById(id);
   });
 
@@ -445,44 +496,13 @@
   function sndClick(){ beep(700,0.04,"sine",0.03); }
   function sndStartup(){ beep(220,0.5,"sine",0.04); }
 
-  /* ---------- INTRO: typing text on black, then splash, then TV ---------- */
-  function runIntro(){
-    var introEl = document.getElementById("intro-black");
-    var textEl = document.getElementById("intro-text");
-    var msg = "Welcome, it's 2012 again.....";
-    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    function finishIntro(){
-      introEl.classList.add("fade-out");
-      setTimeout(function(){ introEl.style.display="none"; runSplash(); }, 450);
-    }
-
-    if(reduced){
-      textEl.innerHTML = msg + '<span class="caret"></span>';
-      setTimeout(finishIntro, 500);
-      return;
-    }
-
-    var i = 0;
-    var typeSpeed = 80;
-    function typeChar(){
-      if(i <= msg.length){
-        textEl.innerHTML = msg.slice(0,i) + '<span class="caret"></span>';
-        i++;
-        setTimeout(typeChar, typeSpeed);
-      }
-    }
-    typeChar();
-    setTimeout(finishIntro, 3000);
-  }
-
+  /* ---------- splash -> CRT boot -> app ---------- */
   function runSplash(){
     var splash = document.getElementById("splash");
     var app = document.getElementById("app");
     var crtBoot = document.getElementById("crt-boot");
     var crtLine = document.getElementById("crt-line");
     var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    splash.classList.add("run");
     var dur = reduced ? 400 : 2000;
     setTimeout(function(){
       splash.classList.add("fade-out");
@@ -493,21 +513,19 @@
         splash.style.display="none";
         app.classList.add("visible");
         els["tv-set"].classList.add("boot");
-        setTimeout(function(){
-          loadCurrentChannel();
-          armAutoHide();
-          showHintOnce();
-        }, 260);
+        loadCurrentChannel();
+        armAutoHide();
+        showHintOnce();
       }, reduced?100:180);
     }, dur);
   }
 
   function showHintOnce(){
     els["hint-layer"].classList.add("show");
-    setTimeout(function(){ els["hint-layer"].classList.remove("show"); }, 2000);
+    setTimeout(function(){ els["hint-layer"].classList.remove("show"); }, 5000);
   }
 
-  /* ---------- auto-hide info overlay (watermark stays persistent) ---------- */
+  /* ---------- auto-hide info overlay (persistent watermark stays) ---------- */
   var hideTimer = null;
   function armAutoHide(){
     els["info-layer"].classList.remove("hidden");
@@ -515,30 +533,8 @@
     hideTimer = setTimeout(function(){ els["info-layer"].classList.add("hidden"); }, 5000);
   }
   ["mousemove","touchstart","keydown","click"].forEach(function(evt){
-    document.addEventListener(evt, function(){
-      armAutoHide();
-      /* safety net: if the player is stuck (autoplay blocked pre-gesture),
-         any real user interaction is a valid gesture to retry playback */
-      if(ytPlayer){
-        try{
-          var st = ytPlayer.getPlayerState();
-          if(st !== 1){ if(!state.muted) ytPlayer.unMute(); ytPlayer.playVideo(); }
-        }catch(e){}
-      }
-    }, {passive:true});
+    document.addEventListener(evt, armAutoHide, {passive:true});
   });
-
-  /* ---------- swipe to change channels (mobile) ---------- */
-  (function(){
-    var touchStartX = null;
-    document.addEventListener("touchstart", function(e){ touchStartX = e.changedTouches[0].clientX; }, {passive:true});
-    document.addEventListener("touchend", function(e){
-      if(touchStartX===null) return;
-      var dx = e.changedTouches[0].clientX - touchStartX;
-      if(Math.abs(dx) > 40){ dx < 0 ? tuneTo(state.currentIndex+1) : tuneTo(state.currentIndex-1); }
-      touchStartX = null;
-    }, {passive:true});
-  })();
 
   /* ---------- clock ---------- */
   function tickClock(){
@@ -550,7 +546,7 @@
   }
   setInterval(tickClock, 1000);
 
-  /* ---------- demo placeholder (only used if a channel has no playlist) ---------- */
+  /* ---------- demo placeholder (used only if a channel has no playlist yet) ---------- */
   var demoRAF = null;
   function drawDemoChannel(canvas, channel){
     var ctx = canvas.getContext("2d");
@@ -598,15 +594,19 @@
     requestAnimationFrame(frame);
   }
 
-  /* ---------- YouTube provider (official IFrame API) ---------- */
+  /* ---------- YouTube provider (official IFrame API, autoplay unmuted by default) ---------- */
   var ytReady = false, ytQueue = [];
   window.onYouTubeIframeAPIReady = function(){ ytReady = true; ytQueue.forEach(function(fn){fn();}); ytQueue=[]; };
   (function loadYT(){ var tag=document.createElement('script'); tag.src="https://www.youtube.com/iframe_api"; document.head.appendChild(tag); })();
   var ytPlayer = null;
   function whenYTReady(cb){ if(ytReady) cb(); else ytQueue.push(cb); }
 
+  /* Live-schedule simulation: map the real clock to a playlist index +
+     an in-episode timestamp, so opening/refreshing the site mid-day
+     drops you into "whatever is on right now" instead of restarting
+     episode 1 every time — like tuning into a live broadcast. */
   var EPISODE_MIN = 13; // rough average episode length in minutes — tune per feel
-  var EPISODE_GUESS_COUNT = 60;
+  var EPISODE_GUESS_COUNT = 60; // safe upper bound; YouTube clamps to the real playlist length
   function liveOffsetFor(channel){
     var now = new Date();
     var totalMinutes = now.getHours()*60 + now.getMinutes() + now.getSeconds()/60;
@@ -616,120 +616,51 @@
     return { index: index, startSeconds: startSeconds };
   }
 
-  /* silently retries playback a few times — no visible UI, just resilience */
-  function ensurePlaying(player, attempt){
-    attempt = attempt || 0;
+  function loadYouTubeChannel(channel){
+    els["demo-canvas"].style.display = "none";
+    els["player-layer"].style.display = "block";
+    els["player-layer"].innerHTML = '<div id="yt-mount"></div>';
+    els["sound-chip"].classList.remove("show");
+    whenYTReady(function(){
+      try{
+        ytPlayer = new YT.Player('yt-mount', {
+          playerVars: {
+            controls:0, disablekb:1, fs:0, rel:0, modestbranding:1,
+            iv_load_policy:3, cc_load_policy:0, playsinline:1, mute:1
+          },
+          events:{
+            'onReady': function(e){
+              try{
+                var off = liveOffsetFor(channel);
+                e.target.loadPlaylist({ list: channel.playlistId, listType:'playlist', index: off.index, startSeconds: off.startSeconds });
+                e.target.unloadModule('captions');
+                if(!state.muted) e.target.unMute();
+                setTimeout(function(){ checkSoundState(e.target); }, 900);
+              }catch(err){}
+            },
+             'onStateChange': function(e){
+              try{ e.target.unloadModule('captions'); }catch(err){}
+            },
+            'onError': function(e){ showState('state-unavailable'); }
+          }
+        });
+      }catch(err){ showState('state-unavailable'); }
+    });
+  }
+  function checkSoundState(player){
     try{
-      var st = player.getPlayerState();
-      if(st !== 1){
-        if(!state.muted) player.unMute();
-        player.playVideo();
+      var st = player.getPlayerState(); // 1 = playing
+      if(st !== 1 || (player.isMuted() && !state.muted)){
+        els["sound-chip"].classList.add("show");
       }
     }catch(e){}
-    if(attempt < 6){ setTimeout(function(){ ensurePlaying(player, attempt+1); }, 500); }
   }
-
-  function loadYouTubeChannel(channel) {
-  els["demo-canvas"].style.display = "none";
-  els["player-layer"].style.display = "block";
-
-  // Hide the player until YouTube actually starts playing.
-  els["player-layer"].style.opacity = "0";
-  els["player-layer"].innerHTML = '<div id="yt-mount"></div>';
-
-  whenYTReady(function () {
-    try {
-      var off = liveOffsetFor(channel);
-
-      ytPlayer = new YT.Player("yt-mount", {
-        playerVars: {
-          listType: "playlist",
-          list: channel.playlistId,
-          index: off.index || 0,
-
-          controls: 0,
-          disablekb: 1,
-          fs: 0,
-          rel: 0,
-          modestbranding: 1,
-          iv_load_policy: 3,
-          cc_load_policy: 0,
-          playsinline: 1,
-          mute: 1,
-          autoplay: 1
-        },
-
-        events: {
-          onReady: function (e) {
-            try {
-              e.target.unloadModule("captions");
-
-              if (!state.muted) {
-                e.target.unMute();
-              }
-
-              // Start playback from the required position.
-              if (off.startSeconds > 0) {
-                e.target.seekTo(off.startSeconds, true);
-              }
-
-              e.target.playVideo();
-            } catch (err) {
-              showState("state-unavailable");
-            }
-          },
-
-          onStateChange: function (e) {
-            try {
-              e.target.unloadModule("captions");
-            } catch (err) {}
-
-            // Only reveal the player when playback actually starts.
-            if (e.data === YT.PlayerState.PLAYING) {
-              els["player-layer"].style.opacity = "1";
-            }
-
-            // If buffering, keep the error screen hidden.
-            if (e.data === YT.PlayerState.BUFFERING) {
-              els["player-layer"].style.opacity = "1";
-            }
-          },
-
-          onError: function (e) {
-            console.log("YouTube error:", e.data);
-
-            // Don't immediately show the YouTube error screen.
-            // Give the playlist a moment to initialize.
-            setTimeout(function () {
-              try {
-                if (
-                  ytPlayer &&
-                  typeof ytPlayer.getPlayerState === "function"
-                ) {
-                  var playerState = ytPlayer.getPlayerState();
-
-                  if (
-                    playerState !== YT.PlayerState.PLAYING &&
-                    playerState !== YT.PlayerState.BUFFERING
-                  ) {
-                    showState("state-unavailable");
-                  }
-                }
-              } catch (err) {
-                showState("state-unavailable");
-              }
-            }, 1500);
-          }
-        }
-      });
-
-    } catch (err) {
-      console.error(err);
-      showState("state-unavailable");
-    }
+  els["sound-chip"].addEventListener("click", function(){
+    state.muted = false;
+    if(ytPlayer){ try{ ytPlayer.unMute(); ytPlayer.playVideo(); }catch(e){} }
+    els["sound-chip"].classList.remove("show");
+    els["btn-mute"].textContent = "🔊";
   });
-}
-    
   function destroyYouTube(){ try{ if(ytPlayer && ytPlayer.destroy) ytPlayer.destroy(); }catch(e){} ytPlayer=null; els["player-layer"].innerHTML=""; }
 
   function hideAllStates(){ els["state-unavailable"].classList.remove("show"); }
@@ -753,13 +684,14 @@
   /* ---------- channel switching / static transition ---------- */
   var switching = false;
   function tuneTo(index){
-    if(switching || !CHANNELS.length) return;
+    if(switching) return;
     index = ((index % CHANNELS.length) + CHANNELS.length) % CHANNELS.length;
     var channel = CHANNELS[index];
     switching = true;
     if(demoRAF) cancelAnimationFrame(demoRAF);
     destroyYouTube();
     hideAllStates();
+    els["sound-chip"].classList.remove("show");
 
     if(state.settings.animations){
       els["static-num"].textContent = channel.number;
@@ -781,17 +713,19 @@
 
   /* ---------- info render ---------- */
   function renderInfoBar(){
-    var ch = currentChannel(); if(!ch) return;
+    var ch = currentChannel();
     els["bug-num"].textContent = ch.number;
     els["bug-name"].textContent = ch.name;
     els["bug-logo"].textContent = ch.name.charAt(0);
     els["bug-logo"].style.background = ch.colorTheme;
     els["pill-thumb"].style.background = ch.colorTheme;
+    els["btn-fav"].classList.toggle("on", !!state.favorites[ch.id]);
+    els["btn-fav"].textContent = state.favorites[ch.id] ? "♥" : "♡";
     els["btn-mute"].textContent = state.muted ? "🔇" : "🔊";
     updateProgramInfo();
   }
   function updateProgramInfo(){
-    var ch = currentChannel(); if(!ch) return;
+    var ch = currentChannel();
     var sched = scheduleFor(ch, new Date());
     var next = sched.slots.filter(function(s){return s.offsetIndex===1;})[0];
     document.getElementById("info-next").textContent = next ? next.title : ch.name+" continues";
@@ -823,7 +757,9 @@
       row.innerHTML =
         '<span class="num">'+ch.number+'</span>'+
         '<span class="logo" style="background:'+ch.colorTheme+'">'+ch.name.charAt(0)+'</span>'+
-        '<span class="meta"><div class="n">'+ch.name+' <span style="font-weight:400;color:var(--cream-dim);font-size:11px;">'+ch.hindi+'</span></div><div class="p">'+ch.category+'</div></span>';
+        '<span class="meta"><div class="n">'+ch.name+' <span style="font-weight:400;color:var(--cream-dim);font-size:11px;">'+ch.hindi+'</span></div><div class="p">'+ch.category+'</div></span>'+
+        '<button class="fav'+(state.favorites[ch.id]?' on':'')+'" aria-label="Favorite">'+(state.favorites[ch.id]?'♥':'♡')+'</button>';
+      row.querySelector(".fav").onclick = function(e){ e.stopPropagation(); state.favorites[ch.id]=!state.favorites[ch.id]; sndClick(); renderBrowserList(); renderInfoBar(); };
       row.onclick = function(){ tuneTo(idx); closeAllOverlays(); };
       els["chan-list"].appendChild(row);
     });
@@ -856,8 +792,10 @@
 
   /* ---------- settings ---------- */
   var SETTINGS_META = [
+    {key:"crt", label:"CRT Mode", desc:"Scanlines, curvature & analog flicker"},
     {key:"sounds", label:"TV Sounds", desc:"Channel change, remote clicks & static"},
-    {key:"animations", label:"Animations", desc:"Static transitions & motion"}
+    {key:"animations", label:"Animations", desc:"Static transitions & motion"},
+    {key:"showRemote", label:"Show Remote", desc:"Enable the on-screen remote button"}
   ];
   function renderSettings(){
     els["settings-list"].innerHTML = "";
@@ -868,20 +806,50 @@
       els["settings-list"].appendChild(row);
     });
     els["settings-list"].querySelectorAll("input[data-set]").forEach(function(inp){
-      inp.addEventListener("change", function(){ state.settings[inp.getAttribute("data-set")] = inp.checked; });
+      inp.addEventListener("change", function(){ state.settings[inp.getAttribute("data-set")] = inp.checked; applySettings(); });
     });
   }
-  function applyCRT(){
+  function applySettings(){
     els["tv-set"].classList.toggle("crt-on", state.settings.crt);
     els["tv-set"].classList.toggle("crt-off", !state.settings.crt);
     els["btn-crt"].classList.toggle("on", state.settings.crt);
+    document.getElementById("btn-remote").style.display = state.settings.showRemote ? "" : "none";
   }
+
+  /* ---------- remote ---------- */
+  function renderRemote(){
+    els["keypad"].innerHTML = "";
+    ["1","2","3","4","5","6","7","8","9","","0",""].forEach(function(k){
+      var b = document.createElement("button"); b.className="rkey"; b.textContent=k; b.style.visibility = k===""?"hidden":"visible";
+      b.onclick = function(){
+        if(!k) return;
+        state.remoteBuffer += k;
+        if(state.remoteBuffer.length>3) state.remoteBuffer = state.remoteBuffer.slice(-3);
+        els["remote-buffer"].textContent = state.remoteBuffer; sndClick();
+      };
+      els["keypad"].appendChild(b);
+    });
+  }
+  document.querySelectorAll("[data-r]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var r = btn.getAttribute("data-r"); sndClick();
+      if(r==="chup") tuneTo(state.currentIndex+1);
+      else if(r==="chdown") tuneTo(state.currentIndex-1);
+      else if(r==="mute") toggleMute();
+      else if(r==="menu"){ closeAllOverlays(); openOverlay("settings"); }
+      else if(r==="ok"){
+        var num = parseInt(state.remoteBuffer,10);
+        if(num){ var idx = CHANNELS.findIndex(function(c){return c.number===num;}); if(idx>=0){ tuneTo(idx); closeAllOverlays(); } }
+        state.remoteBuffer=""; els["remote-buffer"].textContent="";
+      }
+    });
+  });
 
   document.getElementById("btn-retry").addEventListener("click", function(){ tuneTo(state.currentIndex); });
   document.getElementById("btn-goguide").addEventListener("click", function(){ closeAllOverlays(); openOverlay("guide"); });
 
   /* ---------- overlays ---------- */
-  var overlayIds = { menu:"ov-menu", browser:"ov-browser", guide:"ov-guide", settings:"ov-settings" };
+  var overlayIds = { browser:"ov-browser", guide:"ov-guide", settings:"ov-settings", remote:"remote-drawer" };
   function openOverlay(name){
     closeAllOverlays();
     var el = document.getElementById(overlayIds[name]); if(!el) return;
@@ -893,28 +861,33 @@
   function closeAllOverlays(){ Object.keys(overlayIds).forEach(function(k){ document.getElementById(overlayIds[k]).classList.remove("show"); }); }
   document.querySelectorAll("[data-close]").forEach(function(b){ b.addEventListener("click", closeAllOverlays); });
   document.querySelectorAll(".overlay-backdrop").forEach(function(bd){ bd.addEventListener("click", function(e){ if(e.target===bd) closeAllOverlays(); }); });
-
-  document.getElementById("btn-menu").addEventListener("click", function(){ openOverlay("menu"); });
-  document.getElementById("menu-channels").addEventListener("click", function(){ openOverlay("browser"); });
-  document.getElementById("menu-guide").addEventListener("click", function(){ openOverlay("guide"); });
-  document.getElementById("btn-settings").addEventListener("click", function(){ openOverlay("settings"); });
+  document.querySelectorAll("[data-open]").forEach(function(b){
+    b.addEventListener("click", function(){
+      var name = b.getAttribute("data-open");
+      if(b.hasAttribute("data-fav")) state.lastCategory = "ALL";
+      openOverlay(name);
+    });
+  });
+  document.getElementById("btn-channels").addEventListener("click", function(){ openOverlay("browser"); });
+  document.getElementById("btn-remote").addEventListener("click", function(){ openOverlay("remote"); });
 
   /* ---------- top-level controls ---------- */
   document.getElementById("btn-chup").addEventListener("click", function(){ tuneTo(state.currentIndex+1); });
   document.getElementById("btn-chdown").addEventListener("click", function(){ tuneTo(state.currentIndex-1); });
-  els["btn-crt"].addEventListener("click", function(){ state.settings.crt=!state.settings.crt; applyCRT(); });
+  els["btn-fav"].addEventListener("click", function(){ var ch=currentChannel(); state.favorites[ch.id]=!state.favorites[ch.id]; sndClick(); renderInfoBar(); });
+  els["btn-crt"].addEventListener("click", function(){ state.settings.crt=!state.settings.crt; applySettings(); });
   function toggleMute(){
     state.muted = !state.muted;
     els["btn-mute"].textContent = state.muted ? "🔇" : "🔊";
     if(ytPlayer){ try{ state.muted ? ytPlayer.mute() : ytPlayer.unMute(); }catch(e){} }
+    els["sound-chip"].classList.remove("show");
   }
   els["btn-mute"].addEventListener("click", toggleMute);
-
-  function toggleFullscreen(){
+  document.getElementById("btn-fullscreen").addEventListener("click", function(){
     var el = els["screen-shell"];
     if(!document.fullscreenElement){ el.requestFullscreen && el.requestFullscreen(); }
     else { document.exitFullscreen && document.exitFullscreen(); }
-  }
+  });
 
   /* ---------- keyboard (channel + UI nav only — no seek keys) ---------- */
   document.addEventListener("keydown", function(e){
@@ -925,7 +898,7 @@
       case "ArrowRight": tuneTo(state.currentIndex+1); break;
       case "ArrowUp": tuneTo(state.currentIndex-1); break;
       case "ArrowDown": tuneTo(state.currentIndex+1); break;
-      case "f": case "F": toggleFullscreen(); break;
+      case "f": case "F": document.getElementById("btn-fullscreen").click(); break;
       case "m": case "M": toggleMute(); break;
       case "Escape": closeAllOverlays(); break;
     }
@@ -934,10 +907,11 @@
   /* ---------- init ---------- */
   function init(){
     renderTabs();
-    applyCRT();
+    renderRemote();
+    applySettings();
     renderInfoBar();
     tickClock();
-    runIntro();
+    runSplash();
   }
   init();
 })();
