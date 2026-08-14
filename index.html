@@ -414,7 +414,7 @@
   var state = {
     currentIndex: 0,
     settings: { crt:true, sounds:true, animations:true },
-    muted:true,
+    muted:false,
     lastCategory:"ALL"
   };
 
@@ -664,6 +664,7 @@
                 e.target.unloadModule('captions');
                 
                 //if(!state.muted) e.target.unMute();
+                toggleMute();
                 toggleMute();
                 ensurePlaying(e.target);
               }catch(err){}
