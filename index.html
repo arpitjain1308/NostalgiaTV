@@ -664,13 +664,13 @@
             'onReady': function(e){
               try{
                 e.target.unloadModule('captions');
-                e.target.mute();
-        e.target.playVideo();
+              
+                e.target.playVideo();
 
-        setTimeout(function() {
-            e.target.unMute();
-            e.target.playVideo();
-        }, 1000);
+                // setTimeout(function() {
+                //     e.target.unMute();
+                //     e.target.playVideo();
+                // }, 1000);
                 
                 //if(!state.muted) e.target.unMute();
                 ensurePlaying(e.target);
