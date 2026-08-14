@@ -664,6 +664,7 @@
                 e.target.unloadModule('captions');
                 if(!state.muted) e.target.unMute();
                 ensurePlaying(e.target);
+                document.body.click();
               }catch(err){}
             },
             'onStateChange': function(e){
