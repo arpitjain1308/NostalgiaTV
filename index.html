@@ -664,11 +664,15 @@
             'onReady': function(e){
               try{
                 e.target.unloadModule('captions');
+                e.target.mute();
+        e.target.playVideo();
+
+        setTimeout(function() {
+            e.target.unMute();
+            e.target.playVideo();
+        }, 1000);
                 
                 //if(!state.muted) e.target.unMute();
-                //toggleMute();
-                setTimeout(() => ytPlayer.unMute(), 1000);
-                setTimeout(() => ytPlayer.playVideo(), 1000);
                 ensurePlaying(e.target);
 
               }catch(err){}
