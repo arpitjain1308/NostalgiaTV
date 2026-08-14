@@ -30,7 +30,7 @@
 
 window.NOSTALGIA_CHANNELS = [
   { id:"ben10",          number:101, name:"Ben 10",                       hindi:"बेन दस",                     category:"Action", colorTheme:"#3f8f6a", provider:"youtube", playlistId:"PLK9g8ni3KxUEmBTyGIAoZtCeu9-TMUdu9" },
-  { id:"doraemon",       number:102, name:"Doraemon",                     hindi:"डोरेमोन",                    category:"Kids",   colorTheme:"#2e6db4", provider:"youtube", playlistId:"PLGin5RItWjKFR2fg9N3wceUd9GNFN2c7B" },
+  { id:"doraemon",       number:102, name:"Doraemon",                     hindi:"डोरेमोन",                    category:"Kids",   colorTheme:"#2e6db4", provider:"youtube", playlistId:"PLtkOexhoL1E8PjBjALkLHDikMtqlvFRz3" },
   { id:"bheem",          number:103, name:"Chhota Bheem",                 hindi:"छोटा भीम",                   category:"Kids",   colorTheme:"#dba53f", provider:"youtube", playlistId:"PL_J7KQaTDoWzFZOCZL8Q4_HXe5mUDaMC7" },
   { id:"shinchan",       number:104, name:"Shin Chan",                    hindi:"शिन चैन",                     category:"Comedy", colorTheme:"#c74a2e", provider:"youtube", playlistId:"PL-p3lXqFa5sK5iUA5LvwcPXI2150mG81a" },
   { id:"kristribalti",   number:105, name:"Krish Trish and Baltiboy",     hindi:"कृष त्रिष और बाल्टीबॉय",       category:"Kids",   colorTheme:"#7a4fa0", provider:"youtube", playlistId:"PLYo_vJdedAZU" },
