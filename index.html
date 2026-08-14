@@ -667,9 +667,8 @@
                 
                 //if(!state.muted) e.target.unMute();
                 //toggleMute();
-                //setTimeout(() => toggleMute(), 1000);
                 ytPlayer.setVolume(100);
-                toggleMute();
+                setTimeout(() => toggleMute(), 1000);
 
                 ensurePlaying(e.target);
 
