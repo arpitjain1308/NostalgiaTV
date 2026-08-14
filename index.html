@@ -263,6 +263,32 @@
   .menu-option:last-child{ margin-bottom:0; }
   .menu-option .ic{ font-size:20px; }
 
+  #remote-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  opacity: 1;
+  cursor: pointer;
+  transition: opacity .5s ease;
+}
+
+#remote-intro video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+#remote-intro.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
   @media (max-width: 640px){
     .watermark{ font-size:15px; }
     .now-pill{ max-width:94%; }
@@ -278,7 +304,16 @@
 </style>
 </head>
 <body>
-
+<div id="remote-intro">
+  <video
+    id="remote-intro-video"
+    src="remote.mp4"
+    autoplay
+    muted
+    playsinline
+    preload="auto">
+  </video>
+</div>
   <div id="intro-black">
     <div id="intro-text"><span class="caret"></span></div>
   </div>
@@ -351,6 +386,7 @@
           <button class="icon-btn" id="btn-mute" title="Mute / unmute" aria-label="Mute">🔊</button>
           <button class="label-btn" id="btn-crt" title="Toggle CRT mode" aria-label="CRT mode">▦ CRT</button>
           <button class="icon-btn" id="btn-settings" title="Settings" aria-label="Settings">⚙</button>
+          <button class="icon-btn" id="btn-fullscreen" title="Fullscreen" aria-label="Fullscreen">⤢</button>
         </div>
         <button class="ch-btn" id="btn-chup" aria-label="Next channel">CH+ ▶</button>
       </div>
@@ -644,8 +680,6 @@
   }
 
   function loadYouTubeChannel(channel){
-
-    //toggleMute();
     els["demo-canvas"].style.display = "none";
     els["player-layer"].style.display = "block";
     els["player-layer"].style.opacity = "1";
@@ -665,11 +699,6 @@
               try{
                 e.target.unloadModule('captions');
                 e.target.unMute();
-                //e.target.playVideo();
-
-                setTimeout(function() {e.target.playVideo();}, 1000);
-                
-                //if(!state.muted) e.target.unMute();
                 ensurePlaying(e.target);
 
               }catch(err){}
@@ -876,6 +905,7 @@
     if(!document.fullscreenElement){ el.requestFullscreen && el.requestFullscreen(); }
     else { document.exitFullscreen && document.exitFullscreen(); }
   }
+  document.getElementById("btn-fullscreen").addEventListener("click", toggleFullscreen);
 
   /* ---------- keyboard (channel + UI nav only — no seek keys) ---------- */
   document.addEventListener("keydown", function(e){
@@ -892,13 +922,42 @@
     }
   });
 
+  function runRemoteIntro() {
+  var remoteIntro = document.getElementById("remote-intro");
+  var remoteVideo = document.getElementById("remote-intro-video");
+
+  function continueToWebsite() {
+    // Prevent multiple clicks
+    remoteIntro.removeEventListener("click", continueToWebsite);
+
+    // Smoothly remove remote animation
+    remoteIntro.classList.add("fade-out");
+
+    // After fade-out, hide it completely
+    setTimeout(function() {
+      remoteIntro.style.display = "none";
+
+      // Continue with your EXISTING intro
+      runIntro();
+    }, 500);
+  }
+
+  // Start the animation
+  remoteVideo.play().catch(function(err) {
+    console.log("Remote intro autoplay:", err);
+  });
+
+  // User clicks anywhere on the remote screen
+  remoteIntro.addEventListener("click", continueToWebsite);
+}
+
   /* ---------- init ---------- */
   function init(){
     renderTabs();
     applyCRT();
     renderInfoBar();
     tickClock();
-    runIntro();
+    runRemoteIntro();
   }
   init();
 })();
